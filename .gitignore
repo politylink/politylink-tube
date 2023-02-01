@@ -1,0 +1,10 @@
+*.log
+.python-version
+*.ipynb
+.ipynb_checkpoints
+__pycache__/
+.idea
+gpt_index/
+out/
+.venv/
+data/
