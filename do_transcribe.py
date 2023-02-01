@@ -38,7 +38,7 @@ def build_split_task(audio_fp, start, end, out_fp):
     return CommandTask(cmd=cmd, out_fp=out_fp)
 
 
-def build_transcribe_task(wav_fp, model='small'):
+def build_transcribe_task(wav_fp, model='large'):
     whisper_dir = Path(os.environ['WHISPER_ROOT'])
     bin_fp = whisper_dir / 'main'
     model_fp = whisper_dir / f'models/ggml-{model}.bin'
@@ -79,7 +79,7 @@ if __name__ == '__main__':
     parser.add_argument('-i', '--input', help='動画URL', required=True)
     parser.add_argument('-j', '--job', help='ジョブID', type=int, required=True)
     parser.add_argument('-o', '--output', help='出力ディレクトリ', default='./out/transcript')
-    parser.add_argument('-m', '--model', help='Whisperのモデル', default='small')
+    parser.add_argument('-m', '--model', help='Whisperのモデル', default='large')
     parser.add_argument('-v', '--verbose', action='store_true')
     args = parser.parse_args()
 
