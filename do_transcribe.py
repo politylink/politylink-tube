@@ -22,13 +22,8 @@ def get_m3u8_url(video_url):
         raise ValueError(f'failed to extract m3u8 url from {video_url}')
 
 
-def build_download_task(m3u8_url, video_fp):
-    cmd = f'ffmpeg -i {m3u8_url} {video_fp}'
-    return CommandTask(cmd)
-
-
-def build_audio_task(video_fp, audio_fp):
-    cmd = f'ffmpeg -i {video_fp} {audio_fp}'
+def build_download_task(m3u8_url, audio_fp):
+    cmd = f'ffmpeg -i {m3u8_url} {audio_fp}'
     return CommandTask(cmd)
 
 
@@ -59,16 +54,13 @@ def main():
     data_dir.mkdir(parents=True, exist_ok=True)
 
     m3u8_url = get_m3u8_url(args.input)
-    mp4_fp = data_dir / 'video.mp4'
     mp3_fp = data_dir / 'audio.mp3'
     log_fp = log_dir / 'download.log'
     silence_fp = data_dir / 'silence.txt'
     segment_fp = data_dir / 'segment.csv'
 
-    if not mp4_fp.exists():
-        build_download_task(m3u8_url, mp4_fp).run(log_fp=log_fp)
     if not mp3_fp.exists():
-        build_audio_task(mp4_fp, mp3_fp).run()
+        build_download_task(m3u8_url, mp3_fp).run(log_fp=log_fp)
 
     build_silence_task(mp3_fp, silence_fp).run()
     silence_df = read_silence_df(silence_fp)
