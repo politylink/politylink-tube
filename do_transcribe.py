@@ -22,9 +22,9 @@ def get_m3u8_url(video_url):
         raise ValueError(f'failed to extract m3u8 url from {video_url}')
 
 
-def build_download_task(m3u8_url, video_fp, log_fp):
+def build_download_task(m3u8_url, video_fp):
     cmd = f'ffmpeg -i {m3u8_url} {video_fp}'
-    return CommandTask(cmd, log_fp)
+    return CommandTask(cmd)
 
 
 def build_audio_task(video_fp, audio_fp):
@@ -33,8 +33,8 @@ def build_audio_task(video_fp, audio_fp):
 
 
 def build_silence_task(audio_fp, out_fp):
-    cmd = f'ffmpeg -i {audio_fp} -af silencedetect=d=10:n=-10dB -f null -'
-    return CommandTask(cmd, out_fp)
+    cmd = f'ffmpeg -i {audio_fp} -af silencedetect=d=10:n=-10dB,ametadata=mode=print:file={out_fp} -f null -'
+    return CommandTask(cmd)
 
 
 def build_split_task(audio_fp, start, end, out_fp):
@@ -43,12 +43,12 @@ def build_split_task(audio_fp, start, end, out_fp):
     return CommandTask(cmd)
 
 
-def build_transcribe_task(wav_fp, log_fp):
+def build_transcribe_task(wav_fp):
     whisper_dir = Path(os.environ['WHISPER_ROOT'])
     bin_fp = whisper_dir / 'main'
     model_fp = whisper_dir / 'models/ggml-large.bin'
     cmd = f'{bin_fp} --model {model_fp} --language ja --file {wav_fp} --output-csv'
-    return CommandTask(cmd, log_fp)
+    return CommandTask(cmd)
 
 
 def main():
@@ -62,11 +62,11 @@ def main():
     mp4_fp = data_dir / 'video.mp4'
     mp3_fp = data_dir / 'audio.mp3'
     log_fp = log_dir / 'download.log'
-    silence_fp = data_dir / 'silence.log'
+    silence_fp = data_dir / 'silence.txt'
     segment_fp = data_dir / 'segment.csv'
 
     if not mp4_fp.exists():
-        build_download_task(m3u8_url, mp4_fp, log_fp).run()
+        build_download_task(m3u8_url, mp4_fp).run(log_fp)
     if not mp3_fp.exists():
         build_audio_task(mp4_fp, mp3_fp).run()
 
@@ -80,7 +80,7 @@ def main():
         seg_fp = data_dir / '{}.wav'.format(row['segment_id'])
         log_fp = str(seg_fp) + '.log'
         build_split_task(mp3_fp, row['start'], row['end'], seg_fp).run()
-        build_transcribe_task(seg_fp, log_fp).run()
+        build_transcribe_task(seg_fp).run(log_fp=log_fp)
 
 
 if __name__ == '__main__':

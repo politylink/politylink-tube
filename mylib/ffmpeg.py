@@ -14,7 +14,7 @@ def read_silence_df(silence_fp):
 
     records = []
     start = None
-    pattern = r'silence_(start|end): ([0-9.]+)'
+    pattern = r'silence_(start|end)=([0-9.]+)'
     for line in lines:
         match = re.search(pattern, line)
         if match:
@@ -25,7 +25,8 @@ def read_silence_df(silence_fp):
             else:
                 records.append({'start': start, 'end': time})
                 start = None
-    assert start is None
+    if start is not None:
+        records.append({'start': start, 'end': None})
     silence_df = pd.DataFrame(records)
     return silence_df
 
@@ -44,7 +45,7 @@ def to_segment_df(silence_df):
                 'end': int(row['start']) + 1
             })
         start = row['end']
-    # TODO: handle last audio interval?
+    # TODO: handle the last audio interval (in case no silence detected at the end)
     segment_df = pd.DataFrame(records)
     segment_df['duration'] = segment_df['end'] - segment_df['start']
     segment_df = segment_df[segment_df['duration'] >= 5]
