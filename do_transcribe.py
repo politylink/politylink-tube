@@ -24,26 +24,27 @@ def get_m3u8_url(video_url):
 
 def build_download_task(m3u8_url, audio_fp):
     cmd = f'ffmpeg -i {m3u8_url} {audio_fp}'
-    return CommandTask(cmd)
+    return CommandTask(cmd=cmd, out_fp=audio_fp)
 
 
 def build_silence_task(audio_fp, out_fp):
     cmd = f'ffmpeg -i {audio_fp} -af silencedetect=d=10:n=-10dB,ametadata=mode=print:file={out_fp} -f null -'
-    return CommandTask(cmd)
+    return CommandTask(cmd=cmd, out_fp=out_fp)
 
 
 def build_split_task(audio_fp, start, end, out_fp):
     duration = end - start
     cmd = f'ffmpeg -y -ss {start} -i {audio_fp} -t {duration} -ar 16000 -ac 1 -c:a pcm_s16le {out_fp}'
-    return CommandTask(cmd)
+    return CommandTask(cmd=cmd, out_fp=out_fp)
 
 
-def build_transcribe_task(wav_fp):
+def build_transcribe_task(wav_fp, model='small'):
     whisper_dir = Path(os.environ['WHISPER_ROOT'])
     bin_fp = whisper_dir / 'main'
-    model_fp = whisper_dir / 'models/ggml-large.bin'
+    model_fp = whisper_dir / f'models/ggml-{model}.bin'
+    out_fp = wav_fp.parent / (wav_fp.name + '.csv')
     cmd = f'{bin_fp} --model {model_fp} --language ja --file {wav_fp} --output-csv'
-    return CommandTask(cmd)
+    return CommandTask(cmd=cmd, out_fp=out_fp)
 
 
 def main():
@@ -59,9 +60,7 @@ def main():
     silence_fp = data_dir / 'silence.txt'
     segment_fp = data_dir / 'segment.csv'
 
-    if not mp3_fp.exists():
-        build_download_task(m3u8_url, mp3_fp).run(log_fp=log_fp)
-
+    build_download_task(m3u8_url, mp3_fp).run(log_fp=log_fp)
     build_silence_task(mp3_fp, silence_fp).run()
     silence_df = read_silence_df(silence_fp)
     segment_df = to_segment_df(silence_df)
@@ -69,10 +68,10 @@ def main():
     LOGGER.info(f'found {len(segment_df)} segments')
 
     for _, row in segment_df.iterrows():
-        seg_fp = data_dir / '{}.wav'.format(row['segment_id'])
-        log_fp = str(seg_fp) + '.log'
-        build_split_task(mp3_fp, row['start'], row['end'], seg_fp).run()
-        build_transcribe_task(seg_fp).run(log_fp=log_fp)
+        wav_fp = data_dir / '{}.wav'.format(row['segment_id'])
+        log_fp = log_dir / '{}.log'.format(row['segment_id'])
+        build_split_task(mp3_fp, row['start'], row['end'], wav_fp).run()
+        build_transcribe_task(wav_fp, model=args.model).run(log_fp=log_fp)
 
 
 if __name__ == '__main__':
@@ -80,6 +79,7 @@ if __name__ == '__main__':
     parser.add_argument('-i', '--input', help='動画URL', required=True)
     parser.add_argument('-j', '--job', help='ジョブID', type=int, required=True)
     parser.add_argument('-o', '--output', help='出力ディレクトリ', default='./out/transcript')
+    parser.add_argument('-m', '--model', help='Whisperのモデル', default='small')
     parser.add_argument('-v', '--verbose', action='store_true')
     args = parser.parse_args()
 
