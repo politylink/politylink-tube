@@ -16,7 +16,7 @@ class CommandTask:
 
     def run(self, wait=True, log_fp=None):
         LOGGER.info('run command: ' + ' '.join(self.cmd))
-        log_fp = str(log_fp) if log_fp else '/dev/null'
+        log_fp = str(log_fp) or '/dev/null'
         with open(log_fp, 'w') as f:
             if wait:
                 return subprocess.run(self.cmd, stdout=f, stderr=f, encoding='utf-8')

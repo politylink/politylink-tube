@@ -66,7 +66,7 @@ def main():
     segment_fp = data_dir / 'segment.csv'
 
     if not mp4_fp.exists():
-        build_download_task(m3u8_url, mp4_fp).run(log_fp)
+        build_download_task(m3u8_url, mp4_fp).run(log_fp=log_fp)
     if not mp3_fp.exists():
         build_audio_task(mp4_fp, mp3_fp).run()
 
