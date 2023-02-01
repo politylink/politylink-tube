@@ -1,5 +1,10 @@
 ## setup
 
+### Python
+```
+poetry install
+```
+
 ### FFmpeg
 ```
 brew install ffmpeg
