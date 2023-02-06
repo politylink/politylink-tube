@@ -1,0 +1,11 @@
+.words {
+    background-color: white;
+    display: flex;
+    flex-wrap: wrap;
+    overflow: scroll;
+    max-height: 100px;
+}
+
+.activeWord {
+    background-color: pink;
+}
