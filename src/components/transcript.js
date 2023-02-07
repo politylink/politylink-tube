@@ -12,6 +12,6 @@ const Transcript = ({words, onWordClick}) => {
             </div>
         </div>
     )
-}
+};
 
-export default Transcript
+export default Transcript;

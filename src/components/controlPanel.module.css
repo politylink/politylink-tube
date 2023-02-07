@@ -1,0 +1,36 @@
+.panel {
+    overflow: hidden;
+    padding: 10px;
+    margin: auto;
+}
+
+.tabBox {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sliderBox {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.slider {
+    width: 95%;
+    margin: auto;
+}
+
+.timeBox {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: -2px 0 0 0;
+}
+
+.playerBox {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

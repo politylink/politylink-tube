@@ -7,7 +7,7 @@
 export const findActiveWordPosition = (transcriptRoot, time) => {
     const transcriptNodes = transcriptRoot.childNodes;
     for (const [tid, transcript] of transcriptNodes.entries()) {
-        const wordNodes = transcript.childNodes[1].childNodes; // TODO: avoid hard-coding words index (=1)
+        const wordNodes = transcript.childNodes[1].childNodes;
         for (const [wid, word] of wordNodes.entries()) {
             if (word.getAttribute('data-start') >= time) {
                 return [tid, wid];

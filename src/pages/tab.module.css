@@ -10,22 +10,21 @@
 }
 
 .footer {
-    height: 50px;
-    background-color: gray;
 }
 
 .main {
     width: 200%;
     display: flex;
     flex-grow: 1;
+    transition-duration: 0.1s;
 }
 
-.left {
+.movie {
     width: 50%;
     background-color: pink;
 }
 
-.right {
+.transcript {
     width: 50%;
     background-color: antiquewhite;
 }
