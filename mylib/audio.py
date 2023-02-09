@@ -32,13 +32,14 @@ class VoiceActivityDetector:
     simple voice activity detector based on sound volume
     """
 
-    def detect(self, audio: AudioModel, db_thresh=-25, agg_thresh=0.02, window_sec=5, silence_sec=30):
+    def detect(self, audio: AudioModel, db_thresh=-25, agg_thresh=0.02, window_sec=5, silence_sec=30, buffer_sec=1):
         """
         :param audio: audio model
         :param db_thresh: threshold for DB binarization
         :param agg_thresh: threshold for ratio of positive samples in aggregation window
         :param window_sec: aggregation window size in second
         :param silence_sec: ignore silence shorter than this threshold
+        :param buffer_sec:
         :return: detection result as DataFrame
         """
 
@@ -60,8 +61,8 @@ class VoiceActivityDetector:
         out_df = out_df[~out_df['is_test_noise']]
 
         out_df['id'] = range(1, len(out_df) + 1)
-        out_df['start_sec'] = out_df['start_frame'] * window_sec
-        out_df['end_sec'] = out_df['end_frame'] * window_sec
+        out_df['start_sec'] = out_df['start_frame'] * window_sec - buffer_sec
+        out_df['end_sec'] = out_df['end_frame'] * window_sec + buffer_sec
         out_df = out_df[['id', 'start_sec', 'end_sec']]
 
         return out_df
