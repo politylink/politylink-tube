@@ -7,4 +7,3 @@ __pycache__/
 gpt_index/
 out/
 .venv/
-data/

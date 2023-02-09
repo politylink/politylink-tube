@@ -15,7 +15,7 @@ LOGGER = getLogger(__name__)
 @dataclass
 class TranscribeJobInput:
     m3u8_url: str
-    out_dir: str
+    out_dir: [Path | str]
 
 
 class TranscribeJobScheduler:
