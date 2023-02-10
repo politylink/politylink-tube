@@ -26,6 +26,7 @@ class TranscribeJobScheduler:
         jobs = []
         for job_input in job_inputs:
             jobs += self.schedule_single(job_input)
+        jobs = sorted(jobs, key=lambda x: x.priority, reverse=True)
         return jobs
 
     def schedule_single(self, job_input: TranscribeJobInput) -> List[BaseOperator]:
@@ -122,13 +123,14 @@ class AudioSplitJob(BashOperator):
 
 class WhisperJob(BashOperator):
     def __init__(self, wav_fp, log_fp, model='large'):
+        wav_fp = Path(wav_fp)
         whisper_dir = Path(os.environ['WHISPER_ROOT'])
         bin_fp = whisper_dir / 'main'
         model_fp = whisper_dir / f'models/ggml-{model}.bin'
         out_fp = wav_fp.parent / (wav_fp.name + '.csv')
-        bash_command = f'{bin_fp} --model {model_fp} --language ja --file {wav_fp} --output-csv'
+        bash_command = f'{bin_fp} --model {model_fp} --language ja --file {wav_fp} --output-csv　--prompt "静粛に。"'
 
-        super().__init__(bash_command, in_fps=[wav_fp], out_fps=[out_fp], log_fp=log_fp)
+        super().__init__(bash_command, in_fps=[wav_fp], out_fps=[out_fp], log_fp=log_fp, priority=-100)
 
 
 class TranscriptBuilderJob(PythonOperator):
