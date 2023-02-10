@@ -20,6 +20,8 @@
     "@mui/icons-material": "^5.11.0",
     "@mui/material": "^5.11.7",
     "gatsby": "^5.5.0",
+    "gatsby-source-filesystem": "^5.5.0",
+    "gatsby-transformer-json": "^5.5.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-tabs": "^6.0.0",

@@ -1,10 +1,7 @@
-.words {
+.container {
     background-color: white;
     display: flex;
     flex-wrap: wrap;
     overflow: scroll;
-}
-
-.activeWord {
-    background-color: pink;
+    padding: 10px;
 }

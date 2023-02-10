@@ -5,12 +5,12 @@
 
 
 export const findActiveWordPosition = (transcriptRoot, time) => {
-    const transcriptNodes = transcriptRoot.childNodes;
-    for (const [tid, transcript] of transcriptNodes.entries()) {
-        const wordNodes = transcript.childNodes[1].childNodes;
+    const utteranceNodes = transcriptRoot.childNodes[0].childNodes;
+    for (const [uid, utterance] of utteranceNodes.entries()) {
+        const wordNodes = utterance.childNodes[1].childNodes;
         for (const [wid, word] of wordNodes.entries()) {
             if (word.getAttribute('data-start') >= time) {
-                return [tid, wid];
+                return [uid, wid];
             }
         }
     }
@@ -25,9 +25,9 @@ export const eqWordPosition = (p1, p2) => {
 }
 
 export const getWordNode = (transcriptRoot, wordPosition) => {
-    const transcriptNodes = transcriptRoot.childNodes;
-    const [tid, wid] = wordPosition;
-    return transcriptNodes[tid].childNodes[1].childNodes[wid];
+    const utteranceNodes = transcriptRoot.childNodes[0].childNodes;
+    const [uid, wid] = wordPosition;
+    return utteranceNodes[uid].childNodes[1].childNodes[wid];
 }
 
 export const editWordNodeClass = (transcriptRoot, wordPosition, className, add = true) => {
@@ -47,4 +47,33 @@ export const genTestWords = (length) => {
         (v, k) => {
             return {'startTime': k, 'text': `word${k}`}
         });
+}
+
+export const genTestTranscript = () => {
+    return {
+        'utterances': [
+            {
+                "start": 0,
+                "end": 5,
+                "words": [
+                    {"start": 0, "end": 1, "text": "word1"},
+                    {"start": 1, "end": 2, "text": "word2"},
+                    {"start": 2, "end": 3, "text": "word3"},
+                    {"start": 3, "end": 4, "text": "word4"},
+                    {"start": 4, "end": 5, "text": "word5"}
+                ]
+            },
+            {
+                "start": 5,
+                "end": 10,
+                "words": [
+                    {"start": 5, "end": 6, "text": "word6"},
+                    {"start": 6, "end": 7, "text": "word7"},
+                    {"start": 7, "end": 8, "text": "word8"},
+                    {"start": 8, "end": 9, "text": "word9"},
+                    {"start": 9, "end": 10, "text": "word10"}
+                ]
+            }
+        ]
+    }
 }

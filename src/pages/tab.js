@@ -4,7 +4,13 @@ import 'react-tabs/style/react-tabs.css';
 import * as styles from './tab.module.css';
 import Transcript from '../components/transcript';
 import videojs from 'video.js';
-import {editWordNodeClass, eqWordPosition, findActiveWordPosition, genTestWords} from '../utils/transcriptUtils';
+import {
+    editWordNodeClass,
+    eqWordPosition,
+    findActiveWordPosition,
+    genTestTranscript,
+    genTestWords
+} from '../utils/transcriptUtils';
 import {videoJsOptions} from '../utils/videoUtils';
 import ControlPanel from '../components/controlPanel';
 
@@ -18,6 +24,7 @@ const TabPage = () => {
     const playerRef = useRef(null);
     const transcriptRef = useRef(null);
     const activeWordPositionRef = useRef(null);
+    const transcript = genTestTranscript();
     const words = genTestWords(3000); // TODO: change to structured
 
     useEffect(() => {
@@ -81,17 +88,11 @@ const TabPage = () => {
                 <div className={styles.movie}>
                     <div ref={videoRef}/>
                 </div>
-                <div className={styles.transcript}>
-                    <div className={styles.transcripts} ref={transcriptRef}>
-                        <Transcript
-                            words={words.slice(0, 100)}
-                            onWordClick={updateTime}
-                        />
-                        <Transcript
-                            words={words.slice(100)}
-                            onWordClick={updateTime}
-                        />
-                    </div>
+                <div className={styles.transcript} ref={transcriptRef}>
+                    <Transcript
+                        utterances={transcript.utterances}
+                        updateTime={updateTime}
+                    />
                 </div>
             </div>
             <div className={styles.footer}>
