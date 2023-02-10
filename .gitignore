@@ -7,3 +7,4 @@ __pycache__/
 gpt_index/
 out/
 .venv/
+.DS_Store
