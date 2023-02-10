@@ -1,0 +1,43 @@
+.panel {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.header {
+    height: 50px;
+    background-color: aquamarine;
+}
+
+.footer {
+}
+
+.main {
+    width: 200%;
+    display: flex;
+    flex-grow: 1;
+    transition-duration: 0.1s;
+}
+
+.movie {
+    width: 50%;
+    background-color: pink;
+}
+
+.transcript {
+    width: 50%;
+    height: 500px;
+    background-color: antiquewhite;
+}
+
+.transcripts {
+    height: 500px;
+    background-color: white;
+    display: flex;
+    flex-wrap: wrap;
+    overflow: scroll;
+}
+
+.activeWord {
+    background-color: pink;
+}
