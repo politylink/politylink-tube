@@ -54,7 +54,7 @@ class TranscribeJobScheduler:
                 jobs.append(AudioSplitJob(audio_fp=mp3_fp, start_sec=row['start_sec'],
                                           end_sec=row['end_sec'], out_fp=wav_fp))
 
-            # transcribe
+            # transcribe by whisper
             csv_fps = []
             for wav_fp in wav_fps:
                 log_fp = log_dir / 'whisper_{}.log'.format(wav_fp.stem)
@@ -117,6 +117,8 @@ class VADJob(PythonOperator):
 class AudioSplitJob(BashOperator):
     def __init__(self, audio_fp, start_sec, end_sec, out_fp):
         duration = end_sec - start_sec
+        # split and convert to 16-bit WAV as specified by whisper.cpp
+        # https://github.com/ggerganov/whisper.cpp
         bash_command = f'ffmpeg -y -ss {start_sec} -i {audio_fp} -t {duration} -ar 16000 -ac 1 -c:a pcm_s16le {out_fp}'
         super().__init__(bash_command, in_fps=[audio_fp], out_fps=[out_fp])
 
@@ -127,7 +129,8 @@ class WhisperJob(BashOperator):
         whisper_dir = Path(os.environ['WHISPER_ROOT'])
         bin_fp = whisper_dir / 'main'
         model_fp = whisper_dir / f'models/ggml-{model}.bin'
-        out_fp = wav_fp.parent / (wav_fp.name + '.csv')
+        out_fp = wav_fp.parent / (wav_fp.name + '.csv')  # whisper.cpp generate this file with `--output-csv`
+        # specify `--prompt` with punctuation mark
         bash_command = f'{bin_fp} --model {model_fp} --language ja --file {wav_fp} --output-csv　--prompt "静粛に。"'
 
         super().__init__(bash_command, in_fps=[wav_fp], out_fps=[out_fp], log_fp=log_fp, priority=-100)
