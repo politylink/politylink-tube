@@ -5,7 +5,7 @@ import * as styles from './transcript.module.css';
 class Transcript extends PureComponent {
     render() {
         return (
-            <div className={styles.container}>
+            <div className={styles.container} onScroll={this.props.onScroll}>
                 {this.props.utterances.map(({start, end, words}) => (
                     <TranscriptUtterance
                         start={start}

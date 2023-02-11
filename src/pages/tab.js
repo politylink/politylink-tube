@@ -1,6 +1,5 @@
 import * as React from 'react';
 import {useEffect, useRef, useState} from 'react';
-import 'react-tabs/style/react-tabs.css';
 import * as styles from './tab.module.css';
 import Transcript from '../components/transcript';
 import videojs from 'video.js';

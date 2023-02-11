@@ -2,10 +2,9 @@ import * as React from 'react'
 import {useEffect, useRef, useState} from 'react'
 import {graphql} from 'gatsby'
 import Transcript from "../../components/transcript";
-import 'react-tabs/style/react-tabs.css';
 import * as styles from './clip.module.css';
 import videojs from 'video.js';
-import {editWordNodeClass, eqWordPosition, findActiveWordPosition} from '../../utils/transcriptUtils';
+import {editWordNodeClass, eqWordPosition, findActiveWordPosition, scrollToWord} from '../../utils/transcriptUtils';
 import {getVideojsOptions} from '../../utils/videoUtils';
 import ControlPanel from '../../components/controlPanel';
 
@@ -14,6 +13,7 @@ const ClipPage = ({data}) => {
     const [currentTime, setCurrentTime] = useState(0);
     const [isPaused, setIsPaused] = useState(true);
     const [isTranscript, setIsTranscript] = useState(false);
+    const [isAutoScroll, setIsAutoScroll] = useState(true);
 
     const videoRef = useRef(null);
     const playerRef = useRef(null);
@@ -42,6 +42,9 @@ const ClipPage = ({data}) => {
                 editWordNodeClass(transcriptRef.current, activeWordPosition, styles.activeWord);
                 editWordNodeClass(transcriptRef.current, activeWordPositionRef.current, styles.activeWord, false);
                 activeWordPositionRef.current = activeWordPosition;
+                if (isAutoScroll) {
+                    scrollToWord(transcriptRef.current, activeWordPositionRef.current);
+                }
             }
         };
         playerRef.current.on('timeupdate', onTimeUpdate);
@@ -50,11 +53,13 @@ const ClipPage = ({data}) => {
 
     const updateTime = (time) => {
         setCurrentTime(time);
+        enableAutoScroll();
         playerRef.current.currentTime(time);
     }
 
     const startPlayer = () => {
         setIsPaused(false);
+        enableAutoScroll();
         playerRef.current.play();
     }
 
@@ -71,6 +76,20 @@ const ClipPage = ({data}) => {
         setIsTranscript(true);
     }
 
+    const enableAutoScroll = () => {
+        if (!isAutoScroll) {
+            setIsAutoScroll(true);
+            console.log('enabled auto scroll');
+        }
+    }
+
+    const disableAutoScroll = () => {
+        if (isAutoScroll) {
+            setIsAutoScroll(false);
+            console.log('disabled auto scroll');
+        }
+    }
+
     let mainStyle = isTranscript ? {transform: `translateX(-50%)`} : {transform: `translateX(0)`}
     return (
         <div className={styles.panel}>
@@ -85,6 +104,7 @@ const ClipPage = ({data}) => {
                     <Transcript
                         utterances={data.clipJson.transcript.utterances}
                         updateTime={updateTime}
+                        onScroll={disableAutoScroll}
                     />
                 </div>
             </div>

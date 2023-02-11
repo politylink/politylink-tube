@@ -9,7 +9,7 @@ export const findActiveWordPosition = (transcriptRoot, time) => {
     for (const [uid, utterance] of utteranceNodes.entries()) {
         const wordNodes = utterance.childNodes[1].childNodes;
         for (const [wid, word] of wordNodes.entries()) {
-            if (word.getAttribute('data-end') >= time) {
+            if (word.getAttribute('data-end') > time) {
                 return [uid, wid];
             }
         }
@@ -40,6 +40,16 @@ export const editWordNodeClass = (transcriptRoot, wordPosition, className, add =
     } else {
         node.classList.remove(className);
     }
+}
+
+export const scrollToWord = (transcriptRoot, wordPosition) => {
+    const word = getWordNode(transcriptRoot, wordPosition);
+    transcriptRoot.childNodes[0].scrollTo({top: word.offsetTop - 300, behavior: "auto"});
+    console.log(`scrolled to ${word.offsetTop - 300}`);
+    // console.log(word.offsetTop);
+    // console.log(word.compareDocumentPosition(transcriptRoot.childNodes[0]));
+    // console.log(word.getBoundingClientRect());
+    // word.scrollIntoView({behavior: "smooth", inline: "nearest", block: "center"});
 }
 
 export const genTestWords = (length) => {
