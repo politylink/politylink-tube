@@ -13,7 +13,7 @@ LOGGER = getLogger(__name__)
 
 
 @dataclass
-class TranscribeJobInput:
+class TranscribeRequest:
     m3u8_url: str
     out_dir: [Path | str]
 
@@ -22,15 +22,15 @@ class TranscribeJobScheduler:
     def __init__(self):
         self.failed_jobs = []
 
-    def schedule(self, job_inputs: List[TranscribeJobInput]) -> List[BaseOperator]:
+    def schedule_batch(self, requests: List[TranscribeRequest]) -> List[BaseOperator]:
         jobs = []
-        for job_input in job_inputs:
-            jobs += self.schedule_single(job_input)
+        for job_input in requests:
+            jobs += self.schedule(job_input)
         jobs = sorted(jobs, key=lambda x: x.priority, reverse=True)
         return jobs
 
-    def schedule_single(self, job_input: TranscribeJobInput) -> List[BaseOperator]:
-        out_dir = Path(job_input.out_dir)
+    def schedule(self, request: TranscribeRequest) -> List[BaseOperator]:
+        out_dir = Path(request.out_dir)
         data_dir = out_dir / 'data'
         log_dir = out_dir / 'log'
         mp3_fp = data_dir / 'audio.mp3'
@@ -39,7 +39,7 @@ class TranscribeJobScheduler:
 
         jobs = [
             InitDirJob(out_dir),
-            AudioDownloadJob(job_input.m3u8_url, mp3_fp),
+            AudioDownloadJob(request.m3u8_url, mp3_fp),
             VADJob(mp3_fp, vad_fp)
         ]
 
@@ -58,7 +58,7 @@ class TranscribeJobScheduler:
             csv_fps = []
             for wav_fp in wav_fps:
                 log_fp = log_dir / 'whisper_{}.log'.format(wav_fp.stem)
-                csv_fp = wav_fp.parent / (wav_fp.name + '.csv')
+                csv_fp = WhisperJob.get_result_fp(wav_fp)
                 csv_fps.append(csv_fp)
                 jobs.append(WhisperJob(wav_fp, log_fp))
 
@@ -129,11 +129,16 @@ class WhisperJob(BashOperator):
         whisper_dir = Path(os.environ['WHISPER_ROOT'])
         bin_fp = whisper_dir / 'main'
         model_fp = whisper_dir / f'models/ggml-{model}.bin'
-        out_fp = wav_fp.parent / (wav_fp.name + '.csv')  # whisper.cpp generate this file with `--output-csv`
-        # specify `--prompt` with punctuation mark
+        result_fp = self.get_result_fp(wav_fp)
+        # specify `--prompt` to include punctuation marks
         bash_command = f'{bin_fp} --model {model_fp} --language ja --file {wav_fp} --output-csv　--prompt "静粛に。"'
 
-        super().__init__(bash_command, in_fps=[wav_fp], out_fps=[out_fp], log_fp=log_fp, priority=-100)
+        super().__init__(bash_command, in_fps=[wav_fp], out_fps=[result_fp], log_fp=log_fp, priority=-100)
+
+    @staticmethod
+    def get_result_fp(wav_fp: [str | Path]) -> Path:
+        wav_fp = Path(wav_fp)
+        return wav_fp.parent / (wav_fp.name + '.csv')  # whisper.cpp generate this file with `--output-csv`
 
 
 class TranscriptBuilderJob(PythonOperator):

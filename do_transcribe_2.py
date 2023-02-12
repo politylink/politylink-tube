@@ -1,31 +1,35 @@
 import argparse
 import logging
 from pathlib import Path
+from typing import List
 
 import pandas as pd
 
 from mylib.workflow.models import StatusCode
-from mylib.workflow.transcribe import TranscribeJobInput, TranscribeJobScheduler
+from mylib.workflow.transcribe import TranscribeRequest, TranscribeJobScheduler
 
 LOGGER = logging.getLogger(__name__)
 
 
-def main():
-    df = pd.read_csv('./data/video.csv')
-
-    job_inputs = []
+def build_requests(fp) -> List[TranscribeRequest]:
+    requests = []
+    df = pd.read_csv(fp)
     for _, row in df.iterrows():
-        job_inputs.append(TranscribeJobInput(
+        requests.append(TranscribeRequest(
             m3u8_url=row['url'],
             out_dir=Path('./out/transcript') / str(row['id'])
         ))
+    return requests
 
+
+def main():
     scheduler = TranscribeJobScheduler()
     while True:
-        jobs = scheduler.schedule(job_inputs)
+        requests = build_requests('./data/video.csv')
+        jobs = scheduler.schedule_batch(requests)
         LOGGER.info(f'found {len(jobs)} jobs')
         if not jobs:
-            return
+            break
 
         job = jobs[0]
         LOGGER.info(f'run {job}')
