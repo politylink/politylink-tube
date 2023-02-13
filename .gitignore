@@ -9,3 +9,4 @@ out/
 .venv/
 .DS_Store
 db/
+.scrapy

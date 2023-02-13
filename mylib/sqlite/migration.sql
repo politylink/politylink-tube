@@ -1,0 +1,1 @@
+-- ALTER TABLE video ADD COLUMN m3u8_url String;

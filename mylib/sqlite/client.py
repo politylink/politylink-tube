@@ -3,8 +3,8 @@ from typing import List
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from mylib.utils.constants import SQLITE_URL
 from mylib.sqlite.schema import Base
+from mylib.utils.constants import SQLITE_URL
 
 
 class SqliteClient:
