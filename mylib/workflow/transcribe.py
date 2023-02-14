@@ -7,7 +7,8 @@ from typing import List
 
 import pandas as pd
 
-from mylib.audio import AudioModel, VoiceActivityDetector
+from mylib.audio.models import AudioModel
+from mylib.audio.vad import VoiceActivityDetector
 from mylib.workflow.models import BaseOperator, BashOperator, PythonOperator, StatusCode
 
 LOGGER = getLogger(__name__)
