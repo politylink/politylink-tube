@@ -97,6 +97,6 @@ class ShugiinTvSpider(TvSpiderTemplate):
                 speaker_name=speaker_name,
                 speaker_info=speaker_info,
                 start_sec=start_sec,
-                producer=self.__class__.__name__
+                producer='shugiin'
             ))
         return annotations

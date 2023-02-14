@@ -3,21 +3,23 @@ import logging
 from pathlib import Path
 from typing import List
 
-import pandas as pd
-
+from mylib.sqlite.client import SqliteClient
+from mylib.sqlite.schema import Video
 from mylib.workflow.models import StatusCode
 from mylib.workflow.transcribe import TranscribeRequest, TranscribeJobScheduler
 
 LOGGER = logging.getLogger(__name__)
 
 
-def build_requests(fp) -> List[TranscribeRequest]:
+def build_requests() -> List[TranscribeRequest]:
     requests = []
-    df = pd.read_csv(fp)
-    for _, row in df.iterrows():
+    client = SqliteClient()
+    videos = client.select_all(Video)
+    videos = sorted(videos, key=lambda x: x.datetime, reverse=True)  # prioritize the latest videos
+    for video in videos:
         requests.append(TranscribeRequest(
-            m3u8_url=row['url'],
-            out_dir=Path('./out/transcript') / str(row['id'])
+            m3u8_url=video.m3u8_url,
+            out_dir=Path('./out/transcript') / str(video.id)
         ))
     return requests
 
@@ -25,7 +27,7 @@ def build_requests(fp) -> List[TranscribeRequest]:
 def main():
     scheduler = TranscribeJobScheduler()
     while True:
-        requests = build_requests('./data/video.csv')
+        requests = build_requests()
         jobs = scheduler.schedule_batch(requests)
         LOGGER.info(f'found {len(jobs)} jobs')
         if not jobs:

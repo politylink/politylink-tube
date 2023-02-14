@@ -14,7 +14,7 @@ LOGGER = getLogger(__name__)
 class SangiinTvSpider(TvSpiderTemplate):
     name = 'sangiin_tv'
 
-    def __init__(self, start_id=0, end_id=100000, failure_in_row_limit=3, **kwargs):
+    def __init__(self, start_id=0, end_id=100000, failure_in_row_limit=10, **kwargs):
         super().__init__(**kwargs)
         self.start_id = int(start_id)
         self.current_id = int(start_id)
@@ -73,6 +73,6 @@ class SangiinTvSpider(TvSpiderTemplate):
                 speaker_name=speaker_name,
                 speaker_info=speaker_info,
                 start_sec=start_sec,
-                producer=self.__class__.__name__,
+                producer='sangiin'
             ))
         return annotations

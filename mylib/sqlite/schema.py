@@ -24,8 +24,8 @@ class Serializable:
 class Video(Base, Serializable):
     __tablename__ = 'video'
     id = Column(Integer, primary_key=True)
+    m3u8_url = Column(String, index=True)  # order matters when importing CSV with db/init.sql
     page_url = Column(String)
-    m3u8_url = Column(String, index=True)
     datetime = Column(DateTime)
     meeting_name = Column(String)
 

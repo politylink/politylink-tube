@@ -8,5 +8,5 @@ gpt_index/
 out/
 .venv/
 .DS_Store
-db/
+*.db
 .scrapy
