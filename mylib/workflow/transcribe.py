@@ -1,5 +1,6 @@
 import os
 from dataclasses import dataclass
+from datetime import datetime
 from logging import getLogger
 from pathlib import Path
 from typing import List
@@ -16,6 +17,7 @@ LOGGER = getLogger(__name__)
 class TranscribeRequest:
     m3u8_url: str
     out_dir: [Path | str]
+    datetime: datetime
 
 
 class TranscribeJobScheduler:
@@ -24,6 +26,7 @@ class TranscribeJobScheduler:
 
     def schedule_batch(self, requests: List[TranscribeRequest]) -> List[BaseOperator]:
         jobs = []
+        requests = sorted(requests, key=lambda x: x.datetime, reverse=True)  # prioritize the latest when tie-break
         for job_input in requests:
             jobs += self.schedule(job_input)
         jobs = sorted(jobs, key=lambda x: x.priority, reverse=True)

@@ -15,11 +15,11 @@ def build_requests() -> List[TranscribeRequest]:
     requests = []
     client = SqliteClient()
     videos = client.select_all(Video)
-    videos = sorted(videos, key=lambda x: x.datetime, reverse=True)  # prioritize the latest videos
     for video in videos:
         requests.append(TranscribeRequest(
             m3u8_url=video.m3u8_url,
-            out_dir=Path('./out/transcript') / str(video.id)
+            out_dir=Path('./out/transcript') / str(video.id),
+            datetime=video.datetime
         ))
     return requests
 
