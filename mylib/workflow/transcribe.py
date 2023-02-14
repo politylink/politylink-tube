@@ -98,7 +98,6 @@ class InitDirJob(PythonOperator):
 class AudioDownloadJob(BashOperator):
     def __init__(self, m3u8_url, audio_fp):
         bash_command = f'ffmpeg -i {m3u8_url} {audio_fp}'
-
         super().__init__(bash_command, out_fps=[audio_fp])
 
 

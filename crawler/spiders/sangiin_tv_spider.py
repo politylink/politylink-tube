@@ -14,13 +14,13 @@ LOGGER = getLogger(__name__)
 class SangiinTvSpider(TvSpiderTemplate):
     name = 'sangiin_tv'
 
-    def __init__(self, start_id=0, end_id=100000, failure_in_row_limit=10, **kwargs):
+    def __init__(self, start_id=0, end_id=100000, failure_limit=5, **kwargs):
         super().__init__(**kwargs)
         self.start_id = int(start_id)
         self.current_id = int(start_id)
         self.end_id = end_id
-        self.failure_in_row_limit = failure_in_row_limit
-        self.failure_in_row = 0
+        self.failure_limit = failure_limit
+        self.failure_count = 0
 
     def build_next_url(self):
         url = 'https://www.webtv.sangiin.go.jp/webtv/detail.php?sid={}'.format(self.current_id)
@@ -39,15 +39,15 @@ class SangiinTvSpider(TvSpiderTemplate):
         except Exception:
             if '項目が不正です。' not in response.text:
                 LOGGER.exception(f'failed to parse {response.url}')
-            self.failure_in_row += 1
+            self.failure_count += 1
         else:
-            self.failure_in_row = 0
+            self.failure_count = 0  # reset failure count when success
 
-        if self.failure_in_row >= self.failure_in_row_limit:
-            LOGGER.info('reached failure limit')
+        if self.failure_count >= self.failure_limit:
+            LOGGER.info(f'reached failure limit: {response.url}')
             return
         if self.current_id >= self.end_id:
-            LOGGER.info('reached end id')
+            LOGGER.info(f'reached end id: {response.url}')
             return
         yield response.follow(self.build_next_url(), callback=self.parse)
 
