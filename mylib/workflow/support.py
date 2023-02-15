@@ -36,9 +36,7 @@ class SupportTranscribeJobScheduler:
 
 class ScpJob(BashOperator):
     def __init__(self, src_fp: [Path | str], trg_fp: [Path | str]):
+        context = self.init_context(locals())
         bash_command = f'scp {src_fp} {trg_fp}'
-        if '@' in str(trg_fp):
-            in_fps = [src_fp]  # check if local file exists
-        else:
-            in_fps = []
-        super().__init__(bash_command, in_fps=in_fps)
+        context.in_fps = [src_fp] if ('@' not in str(src_fp)) else []  # check if sending from local
+        super().__init__(bash_command, context=context)

@@ -39,7 +39,7 @@ class TranscribeJobScheduler:
         log_dir = out_dir / 'log'
         mp3_fp = data_dir / 'audio.mp3'
         vad_fp = data_dir / 'vad.csv'
-        transcript_fp = data_dir / 'transcript.json'
+        transcript_fp = data_dir / 'transcript.csv'
 
         jobs = [
             InitDirJob(out_dir),
@@ -59,15 +59,14 @@ class TranscribeJobScheduler:
                                           end_sec=row['end_sec'], out_fp=wav_fp))
 
             # transcribe by whisper
-            csv_fps = []
+            result_fps = []
             for wav_fp in wav_fps:
                 log_fp = log_dir / 'whisper_{}.log'.format(wav_fp.stem)
-                csv_fp = WhisperJob.get_result_fp(wav_fp)
-                csv_fps.append(csv_fp)
+                result_fps.append(WhisperJob.get_result_fp(wav_fp))
                 jobs.append(WhisperJob(wav_fp, log_fp))
 
             # summarize
-            jobs.append(TranscriptBuilderJob(in_fps=csv_fps, out_fp=transcript_fp))
+            jobs.append(MergeWhisperJob(vad_fp=vad_fp, result_fps=result_fps, out_fp=transcript_fp))
 
         jobs = list(filter(self.filter_job, jobs))
         return jobs
@@ -84,50 +83,60 @@ class TranscribeJobScheduler:
 
 
 class InitDirJob(PythonOperator):
-    def __init__(self, out_dir):
+    def __init__(self, out_dir: Path):
+        context = self.init_context(locals())
+
         def main():
             log_dir.mkdir(parents=True, exist_ok=True)
             data_dir.mkdir(parents=True, exist_ok=True)
 
         log_dir = Path(out_dir) / 'log'
         data_dir = Path(out_dir) / 'data'
-        context = {'class': self.__class__.__name__, 'args': [out_dir]}
-        super().__init__(main, context, out_fps=[log_dir, data_dir])
+
+        context.out_fps = [log_dir, data_dir]
+        super().__init__(main, context=context)
 
 
 class AudioDownloadJob(BashOperator):
-    def __init__(self, m3u8_url, audio_fp):
+    def __init__(self, m3u8_url: str, audio_fp: Path):
+        context = self.init_context(locals())
         bash_command = f'ffmpeg -i {m3u8_url} {audio_fp}'
-        super().__init__(bash_command, out_fps=[audio_fp])
+        context.out_fps = [audio_fp]
+        super().__init__(bash_command, context=context)
 
 
 class VADJob(PythonOperator):
-    def __init__(self, audio_fp, out_fp):
+    def __init__(self, audio_fp: Path, out_fp: Path):
+        context = self.init_context(locals())
+
         def main():
             audio = AudioModel(audio_fp)
             vad_df = VoiceActivityDetector().detect(audio)
             vad_df.to_csv(out_fp, index=False)
 
-        self.args = [audio_fp, out_fp]
-        context = {'class': self.__class__.__name__, 'args': [audio_fp, out_fp]}
-
-        super().__init__(main, context, in_fps=[audio_fp], out_fps=[out_fp])
-
-    def __repr__(self):
-        return f'<VADJob {self.args}>'
+        context.in_fps = [audio_fp]
+        context.out_fps = [out_fp]
+        super().__init__(main, context=context)
 
 
 class AudioSplitJob(BashOperator):
-    def __init__(self, audio_fp, start_sec, end_sec, out_fp):
+    def __init__(self, audio_fp: Path, start_sec: int, end_sec: int, out_fp: Path):
+        context = self.init_context(locals())
+
         duration = end_sec - start_sec
         # split and convert to 16-bit WAV as specified by whisper.cpp
         # https://github.com/ggerganov/whisper.cpp
         bash_command = f'ffmpeg -y -ss {start_sec} -i {audio_fp} -t {duration} -ar 16000 -ac 1 -c:a pcm_s16le {out_fp}'
-        super().__init__(bash_command, in_fps=[audio_fp], out_fps=[out_fp])
+
+        context.in_fps = [audio_fp]
+        context.out_fps = [out_fp]
+        super().__init__(bash_command, context=context)
 
 
 class WhisperJob(BashOperator):
-    def __init__(self, wav_fp, log_fp, model='large'):
+    def __init__(self, wav_fp: Path, log_fp: Path, model: str = 'large'):
+        context = self.init_context(locals())
+
         wav_fp = Path(wav_fp)
         whisper_dir = Path(os.environ['WHISPER_ROOT'])
         bin_fp = whisper_dir / 'main'
@@ -136,7 +145,11 @@ class WhisperJob(BashOperator):
         prompt = "静粛に。これより、会議を開きます。"  # prompt to include punctuation marks
         bash_command = f'{bin_fp} --model {model_fp} --language ja --file {wav_fp} --output-csv　--prompt {prompt}'
 
-        super().__init__(bash_command, in_fps=[wav_fp], out_fps=[result_fp], log_fp=log_fp, priority=-100)
+        context.in_fps = [wav_fp]
+        context.out_fps = [result_fp]
+        context.log_fp = log_fp
+        context.priority = -100  # de-prioritize to download & split all audio first
+        super().__init__(bash_command, context=context)
 
     @staticmethod
     def get_result_fp(wav_fp: [str | Path]) -> Path:
@@ -144,10 +157,23 @@ class WhisperJob(BashOperator):
         return wav_fp.parent / (wav_fp.name + '.csv')  # whisper.cpp generate this file with `--output-csv`
 
 
-class TranscriptBuilderJob(PythonOperator):
-    def __init__(self, in_fps, out_fp):
-        def main():
-            raise NotImplementedError()
+class MergeWhisperJob(PythonOperator):
+    def __init__(self, vad_fp: Path, result_fps: List[Path], out_fp: Path):
+        context = self.init_context(locals())
 
-        context = {'class': self.__class__.__name__, 'args': [in_fps, out_fp]}
-        super().__init__(main, context, in_fps=in_fps, out_fps=[out_fp])
+        def main():
+            dfs = []
+            vad_df = pd.read_csv(vad_fp)
+            for _, row in vad_df.iterrows():
+                fp = Path(vad_fp).parent / '{}.wav.csv'.format(row['id'])
+                df = pd.read_csv(fp, skipinitialspace=True, header=None, names=['start_ms', 'end_ms', 'text'])
+                df['start_ms'] += row['start_sec'] * 1000
+                df['end_ms'] += row['start_sec'] * 1000
+                dfs.append(df)
+
+            out_df = pd.concat(dfs, axis=0).reset_index(drop=True)
+            out_df.to_csv(out_fp, index=False)
+
+        context.in_fps = [vad_fp] + result_fps
+        context.out_fps = [out_fp]
+        super().__init__(main, context=context)

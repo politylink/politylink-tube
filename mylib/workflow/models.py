@@ -1,4 +1,5 @@
 import subprocess
+from dataclasses import dataclass, field
 from enum import IntEnum
 from logging import getLogger
 from pathlib import Path
@@ -14,19 +15,29 @@ class StatusCode(IntEnum):
     NOT_READY = 3
 
 
-# TODO: define OperatorContext to store in/out/log files, original command arguments...
+@dataclass
+class OperatorContext:
+    class_name: str = ''
+    class_kwargs: Dict = field(default_factory=dict)
+    in_fps: List[Path] = field(default_factory=list)
+    out_fps: List[Path] = field(default_factory=list)
+    log_fp: Path = None
+    priority: int = 0
+
 
 class BaseOperator:
-    def __init__(self, *,
-                 in_fps: List[Path] = None,
-                 out_fps: List[Path] = None,
-                 log_fp: [str | Path] = None,
-                 priority: int = 0):
+    def __init__(self, context: OperatorContext):
+        self.context = context
 
-        self.in_fps = in_fps or []
-        self.out_fps = out_fps or []
-        self.log_fp = log_fp
-        self.priority = priority
+    def init_context(self, locals_: Dict) -> OperatorContext:
+        """
+        call this method at the top of the constructor
+        """
+
+        return OperatorContext(
+            class_name=self.__class__.__name__,
+            class_kwargs={k: v for k, v in locals_.items() if k not in ['self', '__class__']}
+        )
 
     def run(self, force_execute=False, **kwargs) -> StatusCode:
         pre_execute_result = self.pre_execute(force_execute)
@@ -44,13 +55,13 @@ class BaseOperator:
         return StatusCode.SUCCESS
 
     def pre_execute(self, force_execute=False) -> StatusCode:
-        if self.in_fps:
-            is_input_ready = all([Path(fp).exists() for fp in self.in_fps])
+        if self.context.in_fps:
+            is_input_ready = all([Path(fp).exists() for fp in self.context.in_fps])
             if not is_input_ready:
                 return StatusCode.NOT_READY
 
-        if self.out_fps:
-            is_output_ready = all([Path(fp).exists() for fp in self.out_fps])
+        if self.context.out_fps:
+            is_output_ready = all([Path(fp).exists() for fp in self.context.out_fps])
             if is_output_ready and not force_execute:
                 return StatusCode.SKIP
 
@@ -77,24 +88,25 @@ class BashOperator(BaseOperator):
         return False
 
     def execute(self, **kwargs):
-        log_fp = self.log_fp or '/dev/null'
+        log_fp = self.context.log_fp or '/dev/null'
         with open(log_fp, 'w') as f:
             subprocess.run(self.bash_command.split(), stdout=f, stderr=f, encoding='utf-8')
         return StatusCode.SUCCESS  # TODO: check run result
 
 
 class PythonOperator(BaseOperator):
-    def __init__(self, python_callable, context: Dict, **kwargs):
+    def __init__(self, python_callable, **kwargs):
         super().__init__(**kwargs)
-        self.context = context
         self.python_callable = python_callable
 
     def __repr__(self):
-        return f'<{self.context["class"]}({self.context["args"]})>'
+        arg_str = ','.join([f'{k}={v}' for k, v in self.context.class_kwargs.items()])
+        return f'<{self.context.class_name}({arg_str})>'
 
     def __eq__(self, other):
         if isinstance(other, PythonOperator):
-            return self.context == other.context
+            return (self.context.class_name == other.context.class_name) \
+                   and (self.context.class_kwargs == other.context.class_kwargs)
         return False
 
     def execute(self, **kwargs):
