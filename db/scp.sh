@@ -1,0 +1,1 @@
+scp mitsuki@intel:~/politylink/politylink-press/db/local.db local.db

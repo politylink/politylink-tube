@@ -1352,6 +1352,17 @@ python-versions = "*"
 tests = ["pytest"]
 
 [[package]]
+name = "pure-protobuf"
+version = "2.2.2"
+description = "Implementation of Protocol Buffers with dataclass-based schemaʼs"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.extras]
+dev = ["black (>=22.12.0,<23.0.0)", "build (>=0.9.0,<1.0.0)", "coverage[toml] (>=7.0.0,<8.0.0)", "flake8 (>=5.0.0,<6.0.0)", "flake8 (>=6.0.0,<7.0.0)", "isort (>=5.11.3,<6.0.0)", "mypy (>=0.991,<1.0)", "pytest-benchmark (>=4.0.0,<5.0.0)", "pytest (>=7.2.0,<8.0.0)", "twine (>=4.0.2,<5.0.0)"]
+
+[[package]]
 name = "pyasn1"
 version = "0.4.8"
 description = "ASN.1 types and codecs"
@@ -2067,7 +2078,7 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "f4a12cfe03f0800d67336f65545ac3bf111c8efd5c1806ce18541555b2b80a6f"
+content-hash = "546026b1f35fa9d574322b1aec2b35fe81373266fc9d22b1229b93cdf5cf35e9"
 
 [metadata.files]
 aiofiles = []
@@ -2248,6 +2259,7 @@ pure-eval = [
     {file = "pure_eval-0.2.2-py3-none-any.whl", hash = "sha256:01eaab343580944bc56080ebe0a674b39ec44a945e6d09ba7db3cb8cec289350"},
     {file = "pure_eval-0.2.2.tar.gz", hash = "sha256:2b45320af6dfaa1750f543d714b6d1c520a1688dec6fd24d339063ce0aaa9ac3"},
 ]
+pure-protobuf = []
 pyasn1 = [
     {file = "pyasn1-0.4.8-py2.4.egg", hash = "sha256:fec3e9d8e36808a28efb59b489e4528c10ad0f480e57dcc32b4de5c9d8c9fdf3"},
     {file = "pyasn1-0.4.8-py2.5.egg", hash = "sha256:0458773cfe65b153891ac249bcf1b5f8f320b7c2ce462151f8fa74de8934becf"},

@@ -4,4 +4,4 @@
 set -ue
 
 cd ~/politylink/politylink-press
-poetry run python cron.py
+poetry run python cron.py # make sure to add poetry path in .zshenv

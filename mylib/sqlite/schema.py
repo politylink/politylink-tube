@@ -27,6 +27,7 @@ class Video(Base, Serializable):
     m3u8_url = Column(String, index=True)  # order matters when importing CSV with db/init.sql
     page_url = Column(String)
     datetime = Column(DateTime)
+    # house_name = Column(String)
     meeting_name = Column(String)
 
 
@@ -39,6 +40,16 @@ class Annotation(Base, Serializable):
     speaker_name = Column(String)
     speaker_info = Column(String)
     producer = Column(String)
+
+
+class Clip(Base, Serializable):
+    __tablename__ = 'clip'
+    id = Column(Integer, primary_key=True)
+    key = Column(String, unique=True)
+    video_id = Column(Integer)
+    start_sec = Column(Float)
+    end_sec = Column(Float)
+    title = Column(String)
 
 
 Index('ix_annotation_videoId_startSec_producer',

@@ -1,1 +1,1 @@
-ALTER TABLE video ADD COLUMN page_url String;
+ALTER TABLE video ADD COLUMN house_name String;

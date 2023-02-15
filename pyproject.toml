@@ -12,6 +12,7 @@ librosa = "^0.9.2"
 pydantic = "^1.10.4"
 SQLAlchemy = "^2.0.3"
 Scrapy = "^2.8.0"
+pure-protobuf = "^2.2.2"
 
 [tool.poetry.dev-dependencies]
 jupyterlab = "^3.6.1"
