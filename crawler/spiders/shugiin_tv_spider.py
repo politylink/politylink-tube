@@ -75,7 +75,8 @@ class ShugiinTvSpider(TvSpiderTemplate):
     def scrape_video(self, response):
         video = Video(
             page_url=response.url,
-            m3u8_url=self.get_m3u8_url(response)
+            m3u8_url=self.get_m3u8_url(response),
+            house_name='衆議院'
         )
         for row in response.xpath('//div[@id="library"]/table//tr'):
             tds = row.xpath('./td')

@@ -27,7 +27,7 @@ class Video(Base, Serializable):
     m3u8_url = Column(String, index=True)  # order matters when importing CSV with db/init.sql
     page_url = Column(String)
     datetime = Column(DateTime)
-    # house_name = Column(String)
+    house_name = Column(String)
     meeting_name = Column(String)
 
 

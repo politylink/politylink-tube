@@ -19,7 +19,7 @@ class SangiinTvSpider(TvSpiderTemplate):
         self.start_id = int(start_id)
         self.current_id = int(start_id)
         self.end_id = end_id
-        self.failure_limit = failure_limit
+        self.failure_limit = int(failure_limit)
         self.failure_count = 0
 
     def build_next_url(self):
@@ -54,7 +54,8 @@ class SangiinTvSpider(TvSpiderTemplate):
     def scrape_video(self, response) -> Video:
         video = Video(
             page_url=response.url,
-            m3u8_url=self.get_m3u8_url(response)
+            m3u8_url=self.get_m3u8_url(response),
+            house_name='参議院'
         )
         info_dict = scrape_dl(response.css('div#detail-contents-inner').xpath('.//dl'))
         for key, val in info_dict.items():
