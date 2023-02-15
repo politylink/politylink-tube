@@ -30,7 +30,7 @@ class TranscribeJobScheduler:
         requests = sorted(requests, key=lambda x: x.datetime, reverse=True)  # prioritize the latest when tie-break
         for job_input in requests:
             jobs += self.schedule(job_input)
-        jobs = sorted(jobs, key=lambda x: x.priority, reverse=True)
+        jobs = sorted(jobs, key=lambda x: x.context.priority, reverse=True)
         return jobs
 
     def schedule(self, request: TranscribeRequest) -> List[BaseOperator]:
