@@ -4,7 +4,7 @@ from typing import List
 import numpy as np
 import pandas as pd
 
-from mylib.artifact.builders import TranscriptBuilder
+from mylib.artifact.helpers import TranscriptBuildHelper
 from mylib.artifact.models import Transcript, Word
 
 
@@ -21,7 +21,7 @@ def build_transcript_from_whisper(whisper_fp, offset_sec=0):
     df['has_gap'] = df['diff_ms'] > 0
     df['is_name'] = df['text'].apply(is_name)
 
-    builder = TranscriptBuilder()
+    builder = TranscriptBuildHelper()
     for _, row in df.iterrows():
         word = Word(
             start=row['start_ms'] / 1000 + offset_sec,

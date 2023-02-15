@@ -31,7 +31,10 @@ class ClipGenerator:
             )
         ]
         for i, annotation in enumerate(annotations):
-            end_sec = annotations[i + 1].start_sec if (i + 1) < len(annotations) else video_end_sec
+            if (i + 1) < len(annotations):
+                end_sec = annotations[i + 1].start_sec + 10  # add 10 sec buffer
+            else:
+                end_sec = video_end_sec
             clips.append(self.generate_speaker_clip(
                 video=video,
                 annotation=annotation,
