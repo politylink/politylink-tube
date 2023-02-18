@@ -41,6 +41,9 @@ class TranscribeJobScheduler:
         vad_fp = data_dir / 'vad.csv'
         transcript_fp = data_dir / 'transcript.csv'
 
+        if transcript_fp.exists():
+            return list()
+
         jobs = [
             InitDirJob(out_dir),
             AudioDownloadJob(request.m3u8_url, mp3_fp),
