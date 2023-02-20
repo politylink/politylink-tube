@@ -4,7 +4,7 @@ from mylib.artifact.utils import format_date, format_duration
 
 
 def test_format_date():
-    assert format_date(datetime(2023, 2, 1)) == '2023年2月1日'
+    assert format_date(datetime(2023, 2, 1)) == '2023年02月01日'
 
 
 def test_fromat_duration():

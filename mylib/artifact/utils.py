@@ -2,8 +2,7 @@ from datetime import datetime
 
 
 def format_date(dt: datetime):
-    # can not use strftime as it include 0 padding
-    return '{}年{}月{}日'.format(dt.year, dt.month, dt.day)
+    return dt.strftime('%Y年%m月%d日')
 
 
 def format_duration(sec: float):
