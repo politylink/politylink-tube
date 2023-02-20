@@ -36,11 +36,12 @@ def main():
         LOGGER.info(f'found {len(jobs)} jobs')
         if not jobs:
             time.sleep(5)
-            break
+            continue
 
         job = jobs[0]
         LOGGER.info(f'run {job}')
         result = job.run()
+        
         if result != StatusCode.SUCCESS:
             LOGGER.error(f'failed to execute {job}')
             scheduler.record_failed_job(job)
