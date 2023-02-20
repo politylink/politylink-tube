@@ -45,7 +45,6 @@ class ClipGenerator:
     def generate_full_clip(self, video: Video, start_sec: float, end_sec: float) -> Clip:
         key = ClipKey(video_ids=[video.id]).serialize()
         title = ' '.join([
-            video.datetime.strftime('%Y年%m月%d日'),
             video.house_name,
             video.meeting_name
         ])
@@ -61,7 +60,6 @@ class ClipGenerator:
     def generate_speaker_clip(self, video: Video, annotation: Annotation, end_sec: float) -> Clip:
         key = ClipKey(video_ids=[video.id], annotation_ids=[annotation.id]).serialize()
         title = ' '.join([
-            video.datetime.strftime('%Y年%m月%d日'),
             annotation.speaker_name,
             video.meeting_name
         ])

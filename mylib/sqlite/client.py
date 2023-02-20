@@ -4,11 +4,13 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from mylib.sqlite.schema import Base
-from mylib.utils.constants import SQLITE_URL
+from mylib.utils.file import FilePathHelper
 
 
 class SqliteClient:
-    def __init__(self, url=SQLITE_URL, echo=False):
+    def __init__(self, url=None, echo=False):
+        if not url:
+            url = FilePathHelper().get_sqlite_url()
         engine = create_engine(url, echo=echo)
         Base.metadata.create_all(engine)
         Session = sessionmaker(bind=engine)

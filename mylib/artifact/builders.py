@@ -55,7 +55,13 @@ class TranscriptArtifactBuilder:
 
         fp = self.file_path_builder.get_transcript_fp(video_id)
         if not fp.exists():
-            return Transcript()
+            build_helper = TranscriptBuildHelper()
+            build_helper.add_word(Word(
+                start=start_sec,
+                end=end_sec,
+                text='（文字起こし作成中）'
+            ))
+            return build_helper.build()
 
         df = pd.read_csv(fp)
         df['diff_ms'] = calc_diff_time(df['start_ms'].values, df['end_ms'].values)

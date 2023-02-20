@@ -1,2 +1,2 @@
 .mode csv
-.import ../data/video.csv video
+.import ./data/video.csv video

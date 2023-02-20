@@ -11,9 +11,8 @@ LOGGER = getLogger(__name__)
 
 
 def main():
-    sqlite_url = 'sqlite:///db/{}.db'.format(args.host or 'local')
-    sqlite_client = SqliteClient(sqlite_url)
     file_path_helper = FilePathHelper(host=args.host)
+    sqlite_client = SqliteClient(file_path_helper.get_sqlite_url())
     clips = sqlite_client.select_all(Clip, type=ClipType.FULL)
     builder = ClipArtifactBuilder(sqlite_client, file_path_helper)
 
