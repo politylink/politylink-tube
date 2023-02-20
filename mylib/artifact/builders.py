@@ -1,5 +1,4 @@
 import re
-from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -9,12 +8,13 @@ from mylib.artifact.models import Video, Clip, Transcript, Word
 from mylib.artifact.utils import format_date, format_duration
 from mylib.sqlite.client import SqliteClient
 from mylib.sqlite.schema import Clip as ClipDb, Video as VideoDb
+from mylib.utils.file import FilePathHelper
 
 
 class ClipArtifactBuilder:
-    def __init__(self, sqlite_client: SqliteClient):
+    def __init__(self, sqlite_client: SqliteClient, file_path_helper: FilePathHelper):
         self.sqlite_client = sqlite_client
-        self.transcript_builder = TranscriptArtifactBuilder()
+        self.transcript_builder = TranscriptArtifactBuilder(file_path_helper)
 
     def build(self, clip_id) -> Clip:
         clip_db: ClipDb = self.sqlite_client.select_first(ClipDb, id=clip_id)
@@ -35,12 +35,16 @@ class ClipArtifactBuilder:
         )
         return Clip(
             clip_id=clip_id,
+            title=clip_db.title,
             video=video,
             transcript=transcript,
         )
 
 
 class TranscriptArtifactBuilder:
+    def __init__(self, file_path_helper: FilePathHelper):
+        self.file_path_builder = file_path_helper
+
     def build(self, video_id, start_sec=None, end_sec=None) -> Transcript:
         def calc_diff_time(start_vals, end_vals):
             diff_vals = start_vals[1:] - end_vals[:-1]
@@ -49,7 +53,7 @@ class TranscriptArtifactBuilder:
         def is_name(text):
             return re.search(r'君。?$', text)  # TODO: handle 参考人、大臣
 
-        fp = Path(f'./out/transcript/{video_id}/data/transcript.csv')
+        fp = self.file_path_builder.get_transcript_fp(video_id)
         if not fp.exists():
             return Transcript()
 

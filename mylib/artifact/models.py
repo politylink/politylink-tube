@@ -43,6 +43,7 @@ class Transcript(BaseModel):
 
 class Clip(BaseModel):
     clip_id: int = Field(0, alias='clipId')
+    title: str = ''
     video: Video = Field(default_factory=Video)
     transcript: Transcript = Field(default_factory=Transcript)
 
