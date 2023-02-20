@@ -1,49 +1,17 @@
-import re
-from typing import List
-
-import numpy as np
-import pandas as pd
-
-from mylib.artifact.helpers import TranscriptBuildHelper
-from mylib.artifact.models import Transcript, Word
+from datetime import datetime
 
 
-def build_transcript_from_whisper(whisper_fp, offset_sec=0):
-    def calc_diff_time(start_vals, end_vals):
-        diff_vals = start_vals[1:] - end_vals[:-1]
-        return np.pad(diff_vals, (1, 0))
-
-    def is_name(text):
-        return re.search(r'君。?$', text)
-
-    df = pd.read_csv(whisper_fp, skipinitialspace=True, header=None, names=['start_ms', 'end_ms', 'text'])
-    df['diff_ms'] = calc_diff_time(df['start_ms'].values, df['end_ms'].values)
-    df['has_gap'] = df['diff_ms'] > 0
-    df['is_name'] = df['text'].apply(is_name)
-
-    builder = TranscriptBuildHelper()
-    for _, row in df.iterrows():
-        word = Word(
-            start=row['start_ms'] / 1000 + offset_sec,
-            end=row['end_ms'] / 1000 + offset_sec,
-            text=row['text']
-        )
-        if row['is_name']:
-            builder.finish_utterance()  # not always correct when the moderator has multiple utterances
-            builder.add_word(word)
-            builder.finish_utterance()
-        elif row['has_gap']:
-            builder.finish_utterance()
-            builder.add_word(word)
-        else:
-            builder.add_word(word)
-
-    return builder.build()
+def format_date(dt: datetime):
+    # can not use strftime as it include 0 padding
+    return '{}年{}月{}日'.format(dt.year, dt.month, dt.day)
 
 
-def merge_transcripts(transcripts: List[Transcript]):
-    utterances = []
-    for transcript in transcripts:
-        utterances += transcript.utterances
-    utterances = sorted(utterances, key=lambda x: x.start)
-    return Transcript(utterances=utterances)
+def format_duration(sec: float):
+    hour = sec // 3600
+    sec -= hour * 3600
+    minute = sec // 60
+    return f'{hour}h{minute}m'
+
+
+def format_place(house: str, meeting: str):
+    return f'{house} {meeting}'

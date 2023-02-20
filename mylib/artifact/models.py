@@ -7,8 +7,13 @@ from pydantic import BaseModel, Field
 
 class Video(BaseModel):
     url: str = ''
+    page: str = ''
     start: float = 0.
     end: float = 0.
+    date: str = ''
+    duration: str = ''
+    place: str = ''
+    speaker: str = ''
 
 
 class Word(BaseModel):

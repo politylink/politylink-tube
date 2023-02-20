@@ -6,6 +6,7 @@ import pandas as pd
 
 from mylib.artifact.helpers import TranscriptBuildHelper
 from mylib.artifact.models import Video, Clip, Transcript, Word
+from mylib.artifact.utils import format_date, format_duration
 from mylib.sqlite.client import SqliteClient
 from mylib.sqlite.schema import Clip as ClipDb, Video as VideoDb
 
@@ -16,13 +17,16 @@ class ClipArtifactBuilder:
         self.transcript_builder = TranscriptArtifactBuilder()
 
     def build(self, clip_id) -> Clip:
-        clip_db = self.sqlite_client.select_first(ClipDb, id=clip_id)
-        video_db = self.sqlite_client.select_first(VideoDb, id=clip_db.video_id)
+        clip_db: ClipDb = self.sqlite_client.select_first(ClipDb, id=clip_id)
+        video_db: VideoDb = self.sqlite_client.select_first(VideoDb, id=clip_db.video_id)
 
         video = Video(
             url=video_db.m3u8_url,
+            page=video_db.page_url,
             start=clip_db.start_sec,
-            end=clip_db.end_sec
+            end=clip_db.end_sec,
+            date=format_date(video_db.datetime),
+            duration=format_duration(clip_db.end_sec - clip_db.start_sec)
         )
         transcript = self.transcript_builder.build(
             video_id=clip_db.video_id,
