@@ -68,6 +68,8 @@ class SangiinTvSpider(TvSpiderTemplate):
     def scrape_annotations(self, response) -> List[Annotation]:
         annotations = []
         for li in response.css('div#detail-contents-inner').xpath('.//li'):
+            if not li.xpath('.//a'):
+                continue
             speaker_name, speaker_info = self.parse_speaker_text(extract_text(li))
             start_sec = float(extract_href(li)[1:])  # drop "#"
             annotations.append(Annotation(
