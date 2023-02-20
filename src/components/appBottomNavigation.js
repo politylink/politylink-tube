@@ -6,10 +6,11 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import * as React from "react";
 import {Paper} from "@mui/material";
+import {BottomPaper} from "../layout/bottomPaper";
 
 const AppBottomNavigation = ({value}) => {
     return (
-        <Paper sx={{position: 'fixed', bottom: 0, left: 0, right: 0}} elevation={3}>
+        <BottomPaper elevation={3}>
             <BottomNavigation showLabels value={value}>
                 <BottomNavigationAction
                     label="Recent"
@@ -30,7 +31,7 @@ const AppBottomNavigation = ({value}) => {
                     to={"/home3"}
                 />
             </BottomNavigation>
-        </Paper>
+        </BottomPaper>
     );
 };
 
