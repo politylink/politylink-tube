@@ -35,7 +35,7 @@ def main():
         jobs = scheduler.schedule_batch(requests)
         LOGGER.info(f'found {len(jobs)} jobs')
         if not jobs:
-            time.sleep(5)
+            time.sleep(300)
             continue
 
         job = jobs[0]

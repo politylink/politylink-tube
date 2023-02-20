@@ -2,7 +2,7 @@ import argparse
 import logging
 from logging import getLogger
 
-from mylib.workflow.sync import SyncDirJob, SyncFileJob
+from mylib.workflow.sync import SyncDirJob
 
 LOGGER = getLogger(__name__)
 
@@ -10,7 +10,6 @@ LOGGER = getLogger(__name__)
 def main():
     jobs = [
         SyncDirJob(src_dir='mitsuki@mini:~/politylink/politylink-press/out/', dest_dir='./out_mini'),
-        SyncFileJob(src_file='mitsuki@mini:~/politylink/politylink-press/db/local.db', dest_file='./db/mini.db')
     ]
     for job in jobs:
         print(job.bash_command)
