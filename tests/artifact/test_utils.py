@@ -8,6 +8,6 @@ def test_format_date():
 
 
 def test_fromat_duration():
-    assert format_duration(30) == '0h0m'
-    assert format_duration(90) == '0h1m'
-    assert format_duration(7200) == '2h0m'
+    assert format_duration(30.5) == '0h0m'
+    assert format_duration(90.0) == '0h1m'
+    assert format_duration(7200.3) == '2h0m'

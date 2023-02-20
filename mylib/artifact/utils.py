@@ -7,6 +7,7 @@ def format_date(dt: datetime):
 
 
 def format_duration(sec: float):
+    sec = int(sec)
     hour = sec // 3600
     sec -= hour * 3600
     minute = sec // 60
