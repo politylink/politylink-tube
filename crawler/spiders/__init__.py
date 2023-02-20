@@ -26,11 +26,11 @@ class TvSpiderTemplate(SpiderTemplate):
         return url
 
     def merge_video_and_annotations(self, video: Video, annotations: List[Annotation]):
-        self.sqlite_client.merge(video, keys=['m3u8_url'])
+        self.sqlite_client.upsert(video, keys=['m3u8_url'])
         video_id = self.sqlite_client.select_first(Video, m3u8_url=video.m3u8_url).id
         for annotation in annotations:
             annotation.video_id = video_id
-            self.sqlite_client.merge(annotation, keys=['video_id', 'start_sec', 'producer'])
+            self.sqlite_client.upsert(annotation, keys=['video_id', 'start_sec', 'producer'])
 
     @staticmethod
     def parse_speaker_text(text):

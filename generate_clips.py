@@ -19,7 +19,7 @@ def main():
         clips = generator.generate(video.id)
         LOGGER.info(f'generated {len(clips)} clips for {video.id}')
         for clip in clips:
-            sqlite_client.merge(clip, keys=['key'])
+            sqlite_client.upsert(clip, keys=['key'])
 
 
 if __name__ == '__main__':

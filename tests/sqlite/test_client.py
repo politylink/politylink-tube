@@ -24,17 +24,17 @@ class TestSqliteClient:
         assert len(client.select_all(Video)) == 3
         assert len(client.select_all(Video, url='1')) == 2
 
-    def test_merge(self, client):
+    def test_upsert(self, client):
         dt = datetime(2023, 1, 1, 12, 0, 0)
-        client.merge(Video(id=1, url='1'), keys=['url'])
+        client.upsert(Video(id=1, url='1'), keys=['url'])
         assert len(client.select_all(Video)) == 1
-        client.merge(Video(id=2, url='1', datetime=dt), keys=['url'])
+        client.upsert(Video(id=2, url='1', datetime=dt), keys=['url'])
         assert len(client.select_all(Video)) == 1
 
         db_instance = client.select_first(Video, url='1')
         assert db_instance.id == 1
         assert db_instance.datetime == dt
 
-    def test_merge_fail_with_empty_keys(self, client):
+    def test_upsert_fail_with_empty_keys(self, client):
         with pytest.raises(ValueError):
-            client.merge(Video(id=1, url='1'), keys=[])
+            client.upsert(Video(id=1, url='1'), keys=[])

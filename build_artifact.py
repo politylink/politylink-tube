@@ -4,14 +4,14 @@ from logging import getLogger
 
 from mylib.artifact.builders import ClipArtifactBuilder
 from mylib.sqlite.client import SqliteClient
-from mylib.sqlite.schema import Clip
+from mylib.sqlite.schema import Clip, ClipType
 
 LOGGER = getLogger(__name__)
 
 
 def main():
     sqlite_client = SqliteClient()
-    clips = sqlite_client.select_all(Clip)
+    clips = sqlite_client.select_all(Clip, type=ClipType.FULL)
     builder = ClipArtifactBuilder(sqlite_client)
 
     for clip in clips:

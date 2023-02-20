@@ -42,6 +42,13 @@ class Annotation(Base, Serializable):
     producer = Column(String)
 
 
+class ClipType:
+    UNKNOWN = 0
+    FULL = 1
+    SPEAKER = 2
+    TOPIC = 3
+
+
 class Clip(Base, Serializable):
     __tablename__ = 'clip'
     id = Column(Integer, primary_key=True)
@@ -50,6 +57,7 @@ class Clip(Base, Serializable):
     start_sec = Column(Float)
     end_sec = Column(Float)
     title = Column(String)
+    type = Column(Integer)
 
 
 Index('ix_annotation_videoId_startSec_producer',

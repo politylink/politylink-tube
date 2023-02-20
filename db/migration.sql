@@ -1,1 +1,1 @@
-ALTER TABLE video ADD COLUMN house_name String;
+ALTER TABLE clip ADD COLUMN type Integer;

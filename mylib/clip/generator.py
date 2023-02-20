@@ -4,7 +4,7 @@ import pandas as pd
 
 from mylib.clip.key import ClipKey
 from mylib.sqlite.client import SqliteClient
-from mylib.sqlite.schema import Clip, Video, Annotation
+from mylib.sqlite.schema import Clip, Video, Annotation, ClipType
 
 
 class ClipGenerator:
@@ -32,7 +32,7 @@ class ClipGenerator:
         ]
         for i, annotation in enumerate(annotations):
             if (i + 1) < len(annotations):
-                end_sec = annotations[i + 1].start_sec + 10  # add 10 sec buffer
+                end_sec = annotations[i + 1].start_sec + 10  # add 10 sec buffer at the end
             else:
                 end_sec = video_end_sec
             clips.append(self.generate_speaker_clip(
@@ -54,7 +54,8 @@ class ClipGenerator:
             video_id=video.id,
             start_sec=start_sec,
             end_sec=end_sec,
-            title=title
+            title=title,
+            type=ClipType.FULL
         )
 
     def generate_speaker_clip(self, video: Video, annotation: Annotation, end_sec: float) -> Clip:
@@ -70,4 +71,5 @@ class ClipGenerator:
             start_sec=annotation.start_sec,
             end_sec=end_sec,
             title=title,
+            type=ClipType.SPEAKER
         )

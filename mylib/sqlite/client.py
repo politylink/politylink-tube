@@ -38,7 +38,7 @@ class SqliteClient:
         self.session.commit()
         return True
 
-    def merge(self, instance, keys) -> bool:
+    def upsert(self, instance, keys) -> bool:
         if not keys:
             raise ValueError('select at least one merge key')
 
