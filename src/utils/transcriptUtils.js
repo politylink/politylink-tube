@@ -44,8 +44,8 @@ export const editWordNodeClass = (transcriptRoot, wordPosition, className, add =
 
 export const scrollToWord = (transcriptRoot, wordPosition) => {
     const word = getWordNode(transcriptRoot, wordPosition);
-    transcriptRoot.childNodes[0].scrollTo({top: word.offsetTop - 300, behavior: "auto"});
-    console.log(`scrolled to ${word.offsetTop - 300}`);
+    transcriptRoot.childNodes[0].scrollTo({top: word.offsetTop - 100, behavior: "auto"});
+    console.log(`scrolled to ${word.offsetTop - 100}`);
     // console.log(word.offsetTop);
     // console.log(word.compareDocumentPosition(transcriptRoot.childNodes[0]));
     // console.log(word.getBoundingClientRect());

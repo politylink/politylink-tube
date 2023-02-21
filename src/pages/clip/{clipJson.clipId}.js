@@ -19,12 +19,12 @@ const ClipPage = ({data}) => {
     const [currentTime, setCurrentTime] = useState(0);
     const [isPaused, setIsPaused] = useState(true);
     const [isLeft, setIsLeft] = useState(true);
-    const [isAutoScroll, setIsAutoScroll] = useState(true);
 
     const videoRef = useRef(null);
     const playerRef = useRef(null);
     const transcriptRef = useRef(null);
     const activeWordPositionRef = useRef(null);
+    const isAutoScrollRef = useRef(true);
 
     useEffect(() => {
         if (!playerRef.current) {
@@ -43,29 +43,42 @@ const ClipPage = ({data}) => {
             setCurrentTime(currentTime);
             setDuration(duration);
             setIsPaused(isPaused);
-            let activeWordPosition = findActiveWordPosition(transcriptRef.current, currentTime);
-            if (!eqWordPosition(activeWordPosition, activeWordPositionRef.current)) {
-                editWordNodeClass(transcriptRef.current, activeWordPosition, styles.activeWord);
-                editWordNodeClass(transcriptRef.current, activeWordPositionRef.current, styles.activeWord, false);
-                activeWordPositionRef.current = activeWordPosition;
-                if (isAutoScroll) {
-                    scrollToWord(transcriptRef.current, activeWordPositionRef.current);
-                }
-            }
+            highlightTranscript(currentTime);
         };
         playerRef.current.on('timeupdate', onTimeUpdate);
         return () => playerRef.current.off('timeupdate', onTimeUpdate);
     }
 
-    const updateTime = (time) => {
+    const highlightTranscript = (currentTime) => {
+        let activeWordPosition = findActiveWordPosition(transcriptRef.current, currentTime);
+        if (!eqWordPosition(activeWordPosition, activeWordPositionRef.current)) {
+            editWordNodeClass(transcriptRef.current, activeWordPosition, styles.activeWord);
+            editWordNodeClass(transcriptRef.current, activeWordPositionRef.current, styles.activeWord, false);
+            activeWordPositionRef.current = activeWordPosition;
+            console.log(`isAutoScrollRef=${isAutoScrollRef.current}`)
+            if (isAutoScrollRef.current) {
+                scrollToWord(transcriptRef.current, activeWordPositionRef.current);
+            }
+        }
+    }
+
+    const updateTimeWithScroll = (time) => {
         setCurrentTime(time);
-        enableAutoScroll();
+        isAutoScrollRef.current = true;
+        highlightTranscript(time);
+        playerRef.current.currentTime(time);
+    }
+
+    const updateTimeWithoutScroll = (time) => {
+        setCurrentTime(time);
+        isAutoScrollRef.current = false;
+        highlightTranscript(time);
         playerRef.current.currentTime(time);
     }
 
     const startPlayer = () => {
         setIsPaused(false);
-        enableAutoScroll();
+        highlightTranscript(currentTime);
         playerRef.current.play();
     }
 
@@ -74,40 +87,30 @@ const ClipPage = ({data}) => {
         playerRef.current.pause();
     }
 
-    const enableAutoScroll = () => {
-        if (!isAutoScroll) {
-            setIsAutoScroll(true);
-            console.log('enabled auto scroll');
-        }
-    }
-
-    const disableAutoScroll = () => {
-        if (isAutoScroll) {
-            setIsAutoScroll(false);
-            console.log('disabled auto scroll');
-        }
-    }
-
     return (
-        <div className={styles.panel}>
+        <Box>
             <AppTopBar/>
             <Toolbar/>
             <Box sx={{
                 width: isMobile ? '200%' : '100%',
                 display: 'flex',
-                transform: (isMobile && !isLeft) ? 'translateX(-50%)' : 'translateX(0)'
+                transform: (isMobile && !isLeft) ? 'translateX(-50%)' : 'translateX(0)',
+                maxHeight: 'calc(100vh - 200px)', // TODO: fix hardcoded AppBar + BottomController height
+                transitionDuration: '0.1s',
             }}>
-                <Box sx={{width: "50%", padding: 2}}>
+                <Box sx={{width: '50%', padding: 2}}>
                     <Box ref={videoRef}></Box>
                     <Typography variant={'h5'} sx={{backgroundColor: 'white', marginTop: 2}}>
                         {data.clipJson.title}
                     </Typography>
                 </Box>
-                <Box sx={{width: "50%", padding: 2}} ref={transcriptRef}>
+                <Box sx={{width: '50%', padding: 2}} ref={transcriptRef}>
                     <Transcript
                         utterances={data.clipJson.transcript.utterances}
-                        updateTime={updateTime}
-                        onScroll={disableAutoScroll}
+                        updateTime={updateTimeWithoutScroll}
+                        onScroll={() => {
+                            isAutoScrollRef.current = false
+                        }}
                     />
                 </Box>
             </Box>
@@ -118,11 +121,11 @@ const ClipPage = ({data}) => {
                 currentTime={currentTime}
                 duration={duration}
                 isPaused={isPaused}
-                updateTime={updateTime}
+                updateTime={updateTimeWithScroll}
                 startPlayer={startPlayer}
                 stopPlayer={stopPlayer}
             />
-        </div>
+        </Box>
     );
 };
 

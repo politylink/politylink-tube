@@ -6,8 +6,9 @@ class Transcript extends PureComponent {
     render() {
         return (
             <div className={styles.container} onScroll={this.props.onScroll}>
-                {this.props.utterances.map(({start, end, words}) => (
+                {this.props.utterances.map(({start, end, words}, i) => (
                     <TranscriptUtterance
+                        key={i}
                         start={start}
                         end={end}
                         words={words}
