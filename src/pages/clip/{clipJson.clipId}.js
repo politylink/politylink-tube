@@ -91,23 +91,23 @@ const ClipPage = ({data}) => {
     }
 
     return (
-        <Box>
+        <Box sx={{maxHeight: '100%'}}>
             <AppTopBar/>
-            <Toolbar/>
+            <Toolbar variant='dense'/>
             <Box sx={{
                 width: isMobile ? '200%' : '100%',
                 display: 'flex',
                 transform: (isMobile && !isLeft) ? 'translateX(-50%)' : 'translateX(0)',
-                maxHeight: 'calc(100vh - 200px)', // TODO: fix hardcoded AppBar + BottomController height
+                maxHeight: isMobile ? 'calc(100vh - 250px)' : 'calc(100vh - 200px)', // TODO: fix hardcoded AppBar + BottomController height
                 transitionDuration: '0.1s',
             }}>
-                <Box sx={{width: '50%', padding: 2}}>
-                    <Box ref={videoRef}></Box>
+                <Box sx={{width: '50%', maxWidth: '800px', marginX: 'auto'}}>
+                    <Box ref={videoRef} sx={{maxWidth: '800px', margin: 'auto'}}></Box>
                     <Typography variant={'h5'} sx={{backgroundColor: 'white', marginTop: 2}}>
                         {data.clipJson.title}
                     </Typography>
                 </Box>
-                <Box sx={{width: '50%', padding: 2}} ref={transcriptRef}>
+                <Box sx={{width: '50%'}} ref={transcriptRef}>
                     <Transcript
                         utterances={data.clipJson.transcript.utterances}
                         updateTime={updateTimeWithoutScroll}

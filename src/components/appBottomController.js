@@ -13,6 +13,8 @@ import {styled} from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
 import {BottomPaper} from "../layout/bottomPaper";
 import TinyText from "./tinyText";
+import PlayCircleIcon from '@mui/icons-material/PlayCircle';
+import PauseCircleIcon from '@mui/icons-material/PauseCircle';
 
 
 
@@ -33,7 +35,7 @@ const AppBottomController = (
 ) => {
     return (
         <ThemeProvider theme={theme}>
-            <BottomPaper sx={{padding: {xs: 1, sm: 1, md: 2}, backgroundColor: '#f3f2ef'}} elevation={3}>
+            <BottomPaper sx={{padding: {xs: 1, sm: 1, md: 2}, backgroundColor: 'white'}} elevation={3}>
                 <Box sx={{
                     display: {xs: 'flex', sm: 'flex', md: 'none'},
                     alignItems: 'center',
@@ -64,7 +66,6 @@ const AppBottomController = (
                         onChange={(_, value) => updateTime(value)}
                         color='primary'
                         sx={{
-                            color: 'rgba(0,0,0,0.87)',
                             margin: 'auto',
                             width: '95%'
                         }}
@@ -84,17 +85,17 @@ const AppBottomController = (
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    margin: '-30px 0 0 0'
+                    margin: '-30px 0 -10px 0'
                 }}>
                     <IconButton aria-label='replay 30s' onClick={() => updateTime(currentTime - 30)}>
                         <Replay30 color='basic' fontSize='large'/>
                     </IconButton>
                     {isPaused ?
                         <IconButton aria-label='play' onClick={startPlayer}>
-                            <PlayArrowRounded color='basic' sx={{fontSize: '3rem'}}/>
+                            <PlayCircleIcon color='primary' sx={{fontSize: '4rem'}}/>
                         </IconButton> :
                         <IconButton aria-label='pause' onClick={stopPlayer}>
-                            <PauseRounded color='basic' sx={{fontSize: '3rem'}}/>
+                            <PauseCircleIcon color='primary' sx={{fontSize: '4rem'}}/>
                         </IconButton>
                     }
                     <IconButton aria-label='skip 30s' onClick={() => updateTime(currentTime + 30)}>

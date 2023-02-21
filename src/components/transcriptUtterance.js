@@ -7,7 +7,7 @@ import TinyText from "./tinyText";
 class TranscriptUtterance extends PureComponent {
     render() {
         return (
-            <Box data-start={this.props.start} data-end={this.props.end} sx={{margin: 1}}>
+            <Box data-start={this.props.start} data-end={this.props.end} sx={{maxWidth: '800px', margin: 'auto', marginTop: 1}}>
                 <TinyText>
                     {formatTime(this.props.start)}
                 </TinyText>

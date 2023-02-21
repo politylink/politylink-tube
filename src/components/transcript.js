@@ -8,7 +8,7 @@ class Transcript extends PureComponent {
             <Box sx={{
                 backgroundColor: 'white',
                 overflow: 'scroll',
-                paddingX: 3,
+                padding: 3,
                 maxHeight: '100%',
             }} onScroll={this.props.onScroll}>
                 {this.props.utterances.map(({start, end, words}, i) => (
@@ -20,6 +20,7 @@ class Transcript extends PureComponent {
                         updateTime={this.props.updateTime}
                     />
                 ))}
+                <Box sx={{height: '100px'}}/>
             </Box>
         );
     }
