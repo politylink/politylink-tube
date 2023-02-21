@@ -1,8 +1,0 @@
-.container {
-    background-color: white;
-    display: flex;
-    flex-wrap: wrap;
-    overflow: scroll;
-    padding: 10px;
-    max-height: 100%;
-}

@@ -12,14 +12,9 @@ import PauseRounded from "@mui/icons-material/PauseRounded";
 import {styled} from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
 import {BottomPaper} from "../layout/bottomPaper";
+import TinyText from "./tinyText";
 
 
-const TinyText = styled(Typography)({
-    fontSize: '0.75rem',
-    opacity: 0.38,
-    fontWeight: 500,
-    letterSpacing: 0.2,
-});
 
 const theme = createTheme({
     palette: {

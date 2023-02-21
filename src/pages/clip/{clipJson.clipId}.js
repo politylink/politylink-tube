@@ -2,7 +2,7 @@ import * as React from 'react'
 import {useEffect, useRef, useState} from 'react'
 import {graphql} from 'gatsby'
 import Transcript from "../../components/transcript";
-import * as styles from './clip.module.css';
+import * as wordStyles from '../../components/transcriptWord.module.css';
 import videojs from 'video.js';
 import {editWordNodeClass, eqWordPosition, findActiveWordPosition, scrollToWord} from '../../utils/transcriptUtils';
 import {getVideojsOptions} from '../../utils/videoUtils';
@@ -52,32 +52,35 @@ const ClipPage = ({data}) => {
     const highlightTranscript = (currentTime) => {
         let activeWordPosition = findActiveWordPosition(transcriptRef.current, currentTime);
         if (!eqWordPosition(activeWordPosition, activeWordPositionRef.current)) {
-            editWordNodeClass(transcriptRef.current, activeWordPosition, styles.activeWord);
-            editWordNodeClass(transcriptRef.current, activeWordPositionRef.current, styles.activeWord, false);
+            editWordNodeClass(transcriptRef.current, activeWordPosition, wordStyles.active);
+            editWordNodeClass(transcriptRef.current, activeWordPositionRef.current, wordStyles.active, false);
             activeWordPositionRef.current = activeWordPosition;
-            console.log(`isAutoScrollRef=${isAutoScrollRef.current}`)
             if (isAutoScrollRef.current) {
                 scrollToWord(transcriptRef.current, activeWordPositionRef.current);
             }
         }
     }
 
-    const updateTimeWithScroll = (time) => {
+    const updateTime = (time) => {
         setCurrentTime(time);
-        isAutoScrollRef.current = true;
         highlightTranscript(time);
         playerRef.current.currentTime(time);
+
+    }
+
+    const updateTimeWithScroll = (time) => {
+        isAutoScrollRef.current = true;
+        updateTime(time);
     }
 
     const updateTimeWithoutScroll = (time) => {
-        setCurrentTime(time);
         isAutoScrollRef.current = false;
-        highlightTranscript(time);
-        playerRef.current.currentTime(time);
+        updateTime(time);
     }
 
     const startPlayer = () => {
         setIsPaused(false);
+        isAutoScrollRef.current = true; // TODO: trigger immediate scroll?
         highlightTranscript(currentTime);
         playerRef.current.play();
     }
@@ -109,7 +112,7 @@ const ClipPage = ({data}) => {
                         utterances={data.clipJson.transcript.utterances}
                         updateTime={updateTimeWithoutScroll}
                         onScroll={() => {
-                            isAutoScrollRef.current = false
+                            isAutoScrollRef.current = false;
                         }}
                     />
                 </Box>

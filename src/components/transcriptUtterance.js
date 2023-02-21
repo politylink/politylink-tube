@@ -1,16 +1,17 @@
 import React, {PureComponent} from 'react';
 import {formatTime} from "../utils/timeUtils";
 import TranscriptWord from "./transcriptWord";
-import * as styles from './transcriptUtterance.module.css';
+import Box from "@mui/material/Box";
+import TinyText from "./tinyText";
 
 class TranscriptUtterance extends PureComponent {
     render() {
         return (
-            <div data-start={this.props.start} data-end={this.props.end} className={styles.container}>
-                <p className={styles.time}>
+            <Box data-start={this.props.start} data-end={this.props.end} sx={{margin: 1}}>
+                <TinyText>
                     {formatTime(this.props.start)}
-                </p>
-                <div className={styles.words}>
+                </TinyText>
+                <Box>
                     {this.props.words.map(({start, end, text}, i) => (
                         <TranscriptWord
                             key={i}
@@ -20,8 +21,8 @@ class TranscriptUtterance extends PureComponent {
                             updateTime={this.props.updateTime}
                         />
                     ))}
-                </div>
-            </div>
+                </Box>
+            </Box>
         );
     }
 }
