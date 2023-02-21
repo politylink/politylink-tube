@@ -38,7 +38,7 @@ const AppBottomController = (
 ) => {
     return (
         <ThemeProvider theme={theme}>
-            <BottomPaper sx={{padding: {xs: 1, sm: 1, md: 2}}} elevation={3}>
+            <BottomPaper sx={{padding: {xs: 1, sm: 1, md: 2}, backgroundColor: '#f3f2ef'}} elevation={3}>
                 <Box sx={{
                     display: {xs: 'flex', sm: 'flex', md: 'none'},
                     alignItems: 'center',

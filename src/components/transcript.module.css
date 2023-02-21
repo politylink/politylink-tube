@@ -4,5 +4,5 @@
     flex-wrap: wrap;
     overflow: scroll;
     padding: 10px;
-    height: 500px;
+    max-height: 800px;
 }

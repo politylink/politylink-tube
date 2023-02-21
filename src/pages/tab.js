@@ -2,7 +2,7 @@ import * as React from 'react';
 import {useState} from 'react';
 import Box from "@mui/material/Box";
 import {Toolbar, useMediaQuery, useTheme} from "@mui/material";
-import AppBottomPlayer from "../components/appBottomPlayer";
+import AppBottomController from "../components/appBottomController";
 import AppTopBar from "../components/appTopBar";
 
 
@@ -28,7 +28,7 @@ const TabPage = () => {
                 </Box>
             </Box>
 
-            <AppBottomPlayer
+            <AppBottomController
                 isLeft={isLeft}
                 switchLeft={() => setIsLeft(true)}
                 switchRight={() => setIsLeft(false)}

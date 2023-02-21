@@ -2,7 +2,7 @@ import * as React from "react"
 import Grid from "@mui/material/Grid";
 import {Card, CardActionArea, CardMedia, Paper} from "@mui/material";
 import Typography from "@mui/material/Typography";
-import {Link} from "gatsby";
+import {Link as GatsbyLink} from "gatsby";
 import PersonIcon from '@mui/icons-material/Person';
 import PlaceIcon from '@mui/icons-material/Place';
 import Box from "@mui/material/Box";
@@ -11,7 +11,7 @@ import Box from "@mui/material/Box";
 const VideoCard = ({clipUrl, imageUrl, title, date, duration, speaker, place}) => {
     return (
         <Grid item xs={12} sm={6} md={3}>
-            <CardActionArea component={Link} to={clipUrl}>
+            <CardActionArea component={GatsbyLink} to={clipUrl}>
                 <Card square elevation={0}>
                     <CardMedia
                         sx={{height: 200}}

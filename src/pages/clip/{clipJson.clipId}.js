@@ -6,13 +6,19 @@ import * as styles from './clip.module.css';
 import videojs from 'video.js';
 import {editWordNodeClass, eqWordPosition, findActiveWordPosition, scrollToWord} from '../../utils/transcriptUtils';
 import {getVideojsOptions} from '../../utils/videoUtils';
-import ControlPanel from '../../components/controlPanel';
+import AppBottomController from "../../components/appBottomController";
+import AppTopBar from "../../components/appTopBar";
+import {Toolbar, useMediaQuery, useTheme} from "@mui/material";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
 
 const ClipPage = ({data}) => {
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
     const [duration, setDuration] = useState(0);
     const [currentTime, setCurrentTime] = useState(0);
     const [isPaused, setIsPaused] = useState(true);
-    const [isTranscript, setIsTranscript] = useState(false);
+    const [isLeft, setIsLeft] = useState(true);
     const [isAutoScroll, setIsAutoScroll] = useState(true);
 
     const videoRef = useRef(null);
@@ -68,14 +74,6 @@ const ClipPage = ({data}) => {
         playerRef.current.pause();
     }
 
-    const showMovie = () => {
-        setIsTranscript(false);
-    }
-
-    const showTranscript = () => {
-        setIsTranscript(true);
-    }
-
     const enableAutoScroll = () => {
         if (!isAutoScroll) {
             setIsAutoScroll(true);
@@ -90,37 +88,40 @@ const ClipPage = ({data}) => {
         }
     }
 
-    let mainStyle = isTranscript ? {transform: `translateX(-50%)`} : {transform: `translateX(0)`}
     return (
         <div className={styles.panel}>
-            <div className={styles.header}>
-                <p>header</p>
-            </div>
-            <div className={styles.main} style={mainStyle}>
-                <div className={styles.movie}>
-                    <div ref={videoRef}/>
-                </div>
-                <div className={styles.transcript} ref={transcriptRef}>
+            <AppTopBar/>
+            <Toolbar/>
+            <Box sx={{
+                width: isMobile ? '200%' : '100%',
+                display: 'flex',
+                transform: (isMobile && !isLeft) ? 'translateX(-50%)' : 'translateX(0)'
+            }}>
+                <Box sx={{width: "50%", padding: 2}}>
+                    <Box ref={videoRef}></Box>
+                    <Typography variant={'h5'} sx={{backgroundColor: 'white', marginTop: 2}}>
+                        {data.clipJson.title}
+                    </Typography>
+                </Box>
+                <Box sx={{width: "50%", padding: 2}} ref={transcriptRef}>
                     <Transcript
                         utterances={data.clipJson.transcript.utterances}
                         updateTime={updateTime}
                         onScroll={disableAutoScroll}
                     />
-                </div>
-            </div>
-            <div className={styles.footer}>
-                <ControlPanel
-                    duration={duration}
-                    currentTime={currentTime}
-                    isPaused={isPaused}
-                    isTranscript={isTranscript}
-                    updateTime={updateTime}
-                    startPlayer={startPlayer}
-                    stopPlayer={stopPlayer}
-                    showMovie={showMovie}
-                    showTranscript={showTranscript}
-                />
-            </div>
+                </Box>
+            </Box>
+            <AppBottomController
+                isLeft={isLeft}
+                switchLeft={() => setIsLeft(true)}
+                switchRight={() => setIsLeft(false)}
+                currentTime={currentTime}
+                duration={duration}
+                isPaused={isPaused}
+                updateTime={updateTime}
+                startPlayer={startPlayer}
+                stopPlayer={stopPlayer}
+            />
         </div>
     );
 };
@@ -132,6 +133,7 @@ export const query = graphql`
     query ($id: String) {
         clipJson (id: {eq:$id}) {
             clipId
+            title
             video {
                 url
             }
