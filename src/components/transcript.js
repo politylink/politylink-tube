@@ -8,7 +8,8 @@ class Transcript extends PureComponent {
             <Box sx={{
                 backgroundColor: 'white',
                 overflow: 'scroll',
-                padding: 3,
+                paddingX: {xs: 3, sm: 3, md: 5},
+                paddingY: 3,
                 maxHeight: '100%',
             }} onScroll={this.props.onScroll}>
                 {this.props.utterances.map(({start, end, words}, i) => (

@@ -8,9 +8,11 @@ import {editWordNodeClass, eqWordPosition, findActiveWordPosition, scrollToWord}
 import {getVideojsOptions} from '../../utils/videoUtils';
 import AppBottomController from "../../components/appBottomController";
 import AppTopBar from "../../components/appTopBar";
-import {Toolbar, useMediaQuery, useTheme} from "@mui/material";
+import {Chip, Toolbar, useMediaQuery, useTheme} from "@mui/material";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
+import ShareIcon from '@mui/icons-material/Share';
+import Link from "@mui/material/Link";
 
 const ClipPage = ({data}) => {
     const theme = useTheme();
@@ -103,9 +105,39 @@ const ClipPage = ({data}) => {
             }}>
                 <Box sx={{width: '50%', maxWidth: '800px', marginX: 'auto'}}>
                     <Box ref={videoRef} sx={{maxWidth: '800px', margin: 'auto'}}></Box>
-                    <Typography variant={'h5'} sx={{backgroundColor: 'white', marginTop: 2}}>
-                        {data.clipJson.title}
-                    </Typography>
+                    <Box sx={{padding: 1}}>
+                        <Box sx={{display: 'flex', justifyContent: 'center'}}>
+                            <Box sx={{flexGrow: 1}}>
+                                <Typography variant='h5'
+                                            sx={{letterSpacing: -0.05, fontWeight: 'bold', lineHeight: 1.15}}>
+                                    {data.clipJson.title}
+                                </Typography>
+                                <Box sx={{
+                                    marginTop: 0.5,
+                                    display: "flex",
+                                    alignItems: "center",
+                                }}>
+                                    <Typography variant="body1" color="text.secondary">
+                                        {data.clipJson.video.date}
+                                    </Typography>
+                                    <Typography variant="body1" color="text.secondary" sx={{marginLeft: 3}}>
+                                        {data.clipJson.video.duration}
+                                    </Typography>
+                                </Box>
+                            </Box>
+                            <Box sx={{display: 'flex', alignItems: 'center'}}>
+                                <Chip color='primary' icon={<ShareIcon/>} label={'共有'} sx={{marginX: 1}}/>
+                            </Box>
+                        </Box>
+                        <Box sx={{marginTop: 2}}>
+                            <Typography>
+                                【公式サイト】
+                            </Typography>
+                            <Link href={data.clipJson.video.page} target="_blank" rel="noopener">
+                                {data.clipJson.video.page}
+                            </Link>
+                        </Box>
+                    </Box>
                 </Box>
                 <Box sx={{width: '50%'}} ref={transcriptRef}>
                     <Transcript
@@ -142,6 +174,9 @@ export const query = graphql`
             title
             video {
                 url
+                page
+                date
+                duration
             }
             transcript {
                 utterances {
