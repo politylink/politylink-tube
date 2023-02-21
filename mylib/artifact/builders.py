@@ -5,7 +5,7 @@ import pandas as pd
 
 from mylib.artifact.helpers import TranscriptBuildHelper
 from mylib.artifact.models import Video, Clip, Transcript, Word
-from mylib.artifact.utils import format_date, format_duration
+from mylib.artifact.utils import format_date, format_duration, clean_text, is_moderator
 from mylib.sqlite.client import SqliteClient
 from mylib.sqlite.schema import Clip as ClipDb, Video as VideoDb
 from mylib.utils.file import FilePathHelper
@@ -50,8 +50,6 @@ class TranscriptArtifactBuilder:
             diff_vals = start_vals[1:] - end_vals[:-1]
             return np.pad(diff_vals, (1, 0))
 
-        def is_name(text):
-            return re.search(r'君。?$', text)  # TODO: handle 参考人、大臣
 
         fp = self.file_path_builder.get_transcript_fp(video_id)
         if not fp.exists():
@@ -64,9 +62,11 @@ class TranscriptArtifactBuilder:
             return build_helper.build()
 
         df = pd.read_csv(fp)
+        df['text'] = df['text'].apply(clean_text)
+        df = df[df['text'] != '']
         df['diff_ms'] = calc_diff_time(df['start_ms'].values, df['end_ms'].values)
         df['has_gap'] = df['diff_ms'] > 0
-        df['is_name'] = df['text'].apply(is_name)
+        df['is_moderator'] = df['text'].apply(is_moderator)
 
         if start_sec:
             df = df[df['end_ms'] > start_sec * 1000]
@@ -80,7 +80,7 @@ class TranscriptArtifactBuilder:
                 end=row['end_ms'] / 1000,
                 text=row['text']
             )
-            if row['is_name']:
+            if row['is_moderator']:
                 build_helper.finish_utterance()  # not always correct when the moderator has multiple utterances
                 build_helper.add_word(word)
                 build_helper.finish_utterance()
