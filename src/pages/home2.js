@@ -4,7 +4,7 @@ import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
 import VideoCard from "../components/videoCard";
 import {graphql} from 'gatsby'
-import {buildClipUrl} from "../utils/urlUtils";
+import {buildClipImageUrl, buildClipUrl} from "../utils/urlUtils";
 
 
 const HomePage2 = ({data}) => {
@@ -18,7 +18,7 @@ const HomePage2 = ({data}) => {
                             <VideoCard
                                 key={clip.clipId}
                                 clipUrl={buildClipUrl(clip.clipId)}
-                                imageUrl="https://image.politylink.jp/clips/clip/l/100.jpg"
+                                imageUrl={buildClipImageUrl(clip.clipId)}
                                 title={clip.title}
                                 date={clip.video.date}
                                 duration={clip.video.duration}

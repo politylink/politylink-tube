@@ -100,7 +100,7 @@ const ClipPage = ({data}) => {
                 width: isMobile ? '200%' : '100%',
                 display: 'flex',
                 transform: (isMobile && !isLeft) ? 'translateX(-50%)' : 'translateX(0)',
-                maxHeight: isMobile ? 'calc(100vh - 250px)' : 'calc(100vh - 200px)', // TODO: fix hardcoded AppBar + BottomController height
+                height: isMobile ? 'calc(100vh - 250px)' : 'calc(100vh - 200px)', // TODO: fix hardcoded AppBar + BottomController height
                 transitionDuration: '0.1s',
             }}>
                 <Box sx={{width: '50%', maxWidth: '800px', marginX: 'auto'}}>

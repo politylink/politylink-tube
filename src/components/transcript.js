@@ -10,7 +10,7 @@ class Transcript extends PureComponent {
                 overflow: 'scroll',
                 paddingX: {xs: 3, sm: 3, md: 5},
                 paddingY: 3,
-                maxHeight: '100%',
+                height: '100%',
             }} onScroll={this.props.onScroll}>
                 {this.props.utterances.map(({start, end, words}, i) => (
                     <TranscriptUtterance
@@ -21,7 +21,11 @@ class Transcript extends PureComponent {
                         updateTime={this.props.updateTime}
                     />
                 ))}
-                <Box sx={{height: '100px'}}/>
+                {/* safeguard to avoid footer overlap. need to mimic TranscriptUtterance DOM for transcriptUtil.js */}
+                <Box sx={{height: '100px'}}>
+                    <div/>
+                    <div/>
+                </Box>
             </Box>
         );
     }
