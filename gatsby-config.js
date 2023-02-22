@@ -14,5 +14,13 @@ module.exports = {
                 path: `${__dirname}/artifact/clip`,
             },
         },
+        {
+            resolve: `gatsby-plugin-s3`,
+            options: {
+                bucketName: "politylink-gatsby",
+                protocol: "https",
+                hostname: "politylink.jp",
+            },
+        },
     ],
 }
