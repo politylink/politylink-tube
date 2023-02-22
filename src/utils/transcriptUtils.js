@@ -48,41 +48,4 @@ export const scrollToWord = (transcriptRoot, wordPosition) => {
     }
     const word = getWordNode(transcriptRoot, wordPosition);
     transcriptRoot.childNodes[0].scrollTo({top: word.offsetTop - 100, behavior: "auto"});
-    console.log(`scrolled to ${word.offsetTop - 100}`);
-}
-
-export const genTestWords = (length) => {
-    return Array.from({length: length},
-        (v, k) => {
-            return {'startTime': k, 'text': `word${k}`}
-        });
-}
-
-export const genTestTranscript = () => {
-    return {
-        'utterances': [
-            {
-                "start": 0,
-                "end": 5,
-                "words": [
-                    {"start": 0, "end": 1, "text": "word1"},
-                    {"start": 1, "end": 2, "text": "word2"},
-                    {"start": 2, "end": 3, "text": "word3"},
-                    {"start": 3, "end": 4, "text": "word4"},
-                    {"start": 4, "end": 5, "text": "word5"}
-                ]
-            },
-            {
-                "start": 5,
-                "end": 10,
-                "words": [
-                    {"start": 5, "end": 6, "text": "word6"},
-                    {"start": 6, "end": 7, "text": "word7"},
-                    {"start": 7, "end": 8, "text": "word8"},
-                    {"start": 8, "end": 9, "text": "word9"},
-                    {"start": 9, "end": 10, "text": "word10"}
-                ]
-            }
-        ]
-    }
 }

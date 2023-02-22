@@ -34,6 +34,7 @@ const ClipPage = ({data}) => {
             videoElement.classList.add('vjs-big-play-centered');
             videoRef.current.appendChild(videoElement);
             playerRef.current = videojs(videoElement, getVideojsOptions(data.clipJson.video.url), onReady);
+            videoRef.current.childNodes[0].childNodes[0].setAttribute('playsinline', '');
         }
     }, [videoRef]);
 
