@@ -15,7 +15,7 @@ const AppLeftNavigation = ({value}) => {
             flexShrink: 0,
             [`& .MuiDrawer-paper`]: {width: drawerWidth, boxSizing: 'border-box'}
         }}>
-            <Toolbar/>
+            <Toolbar variant='dense'/>
             <Box sx={{overflow: 'auto'}}>
                 <List>
                     <ListItem disablePadding>

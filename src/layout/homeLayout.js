@@ -15,8 +15,8 @@ const HomeLayout = ({children, value}) => {
             {isLarge &&
                 <AppLeftNavigation value={value}/>
             }
-            <Box sx={{flexGrow: 1, marginY: 1, marginX: 0}}>
-                <Toolbar/>
+            <Box sx={{flexGrow: 1, margin: 0}}>
+                <Toolbar variant='dense'/>
                 {children}
                 <Toolbar/>
             </Box>

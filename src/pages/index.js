@@ -11,8 +11,8 @@ const IndexPage = ({data}) => {
     const clips = data.allClipJson.nodes;
     return (
         <HomeLayout value={0}>
-            <Container maxWidth="lg" sx={{padding: 0}}>
-                <Grid container spacing={1}>
+            <Container maxWidth="lg" sx={{padding: {xs: 0, sm: 1}}}>
+                <Grid container spacing={{xs: 0, sm: 1}}>
                     {
                         clips.map(clip => (
                             <VideoCard

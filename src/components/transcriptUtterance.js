@@ -2,7 +2,7 @@ import React, {PureComponent} from 'react';
 import {formatTime} from "../utils/timeUtils";
 import TranscriptWord from "./transcriptWord";
 import Box from "@mui/material/Box";
-import TinyText from "./tinyText";
+import TinyText from "../layout/tinyText";
 
 class TranscriptUtterance extends PureComponent {
     render() {

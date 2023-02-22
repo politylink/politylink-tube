@@ -7,15 +7,10 @@ import Slider from "@mui/material/Slider";
 import {formatTime} from "../utils/timeUtils";
 import IconButton from "@mui/material/IconButton";
 import {Forward30, Replay30} from "@mui/icons-material";
-import PlayArrowRounded from "@mui/icons-material/PlayArrowRounded";
-import PauseRounded from "@mui/icons-material/PauseRounded";
-import {styled} from "@mui/material/styles";
-import Typography from "@mui/material/Typography";
 import {BottomPaper} from "../layout/bottomPaper";
-import TinyText from "./tinyText";
+import TinyText from "../layout/tinyText";
 import PlayCircleIcon from '@mui/icons-material/PlayCircle';
 import PauseCircleIcon from '@mui/icons-material/PauseCircle';
-
 
 
 const theme = createTheme({
