@@ -29,7 +29,7 @@ const IndexPage = ({data}) => {
             </Container>
         </HomeLayout>
     )
-}
+};
 
 
 export const query = graphql`
