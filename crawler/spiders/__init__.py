@@ -25,7 +25,7 @@ class TvSpiderTemplate(SpiderTemplate):
         url = url.replace('http://', 'https://')
         return url
 
-    def merge_video_and_annotations(self, video: Video, annotations: List[Annotation]):
+    def upsert_video_and_annotations(self, video: Video, annotations: List[Annotation]):
         self.sqlite_client.upsert(video, keys=['m3u8_url'])
         video_id = self.sqlite_client.select_first(Video, m3u8_url=video.m3u8_url).id
         for annotation in annotations:

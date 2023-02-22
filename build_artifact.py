@@ -5,20 +5,20 @@ from logging import getLogger
 from mylib.artifact.builders import ClipArtifactBuilder
 from mylib.sqlite.client import SqliteClient
 from mylib.sqlite.schema import Clip, ClipType
-from mylib.utils.file import FilePathHelper
+from mylib.utils.path import PathHelper
 
 LOGGER = getLogger(__name__)
 
 
 def main():
-    file_path_helper = FilePathHelper(host=args.host)
-    sqlite_client = SqliteClient(file_path_helper.get_sqlite_url())
+    path_helper = PathHelper(host=args.host)
+    sqlite_client = SqliteClient(path_helper.get_sqlite_url())
     clips = sqlite_client.select_all(Clip, type=ClipType.FULL)
-    builder = ClipArtifactBuilder(sqlite_client, file_path_helper)
+    builder = ClipArtifactBuilder(sqlite_client, path_helper)
 
     for clip in clips:
         artifact = builder.build(clip.id)
-        fp = file_path_helper.get_clip_fp(clip.id)
+        fp = path_helper.get_clip_fp(clip.id)
         with open(fp, 'w') as f:
             f.write(artifact.json(ensure_ascii=False, indent=2, by_alias=True))
         LOGGER.info(f'saved {fp}')

@@ -34,7 +34,7 @@ class SangiinTvSpider(TvSpiderTemplate):
         try:
             video = self.scrape_video(response)
             annotations = self.scrape_annotations(response)
-            self.merge_video_and_annotations(video, annotations)
+            self.upsert_video_and_annotations(video, annotations)
             LOGGER.info(f'saved video with {len(annotations)} annotations from {response.url}')
         except Exception:
             if '項目が不正です。' not in response.text:

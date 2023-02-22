@@ -8,13 +8,13 @@ from mylib.artifact.models import Video, Clip, Transcript, Word
 from mylib.artifact.utils import format_date, format_duration, clean_text, is_moderator
 from mylib.sqlite.client import SqliteClient
 from mylib.sqlite.schema import Clip as ClipDb, Video as VideoDb
-from mylib.utils.file import FilePathHelper
+from mylib.utils.path import PathHelper
 
 
 class ClipArtifactBuilder:
-    def __init__(self, sqlite_client: SqliteClient, file_path_helper: FilePathHelper):
+    def __init__(self, sqlite_client: SqliteClient, path_helper: PathHelper):
         self.sqlite_client = sqlite_client
-        self.transcript_builder = TranscriptArtifactBuilder(file_path_helper)
+        self.transcript_builder = TranscriptArtifactBuilder(path_helper)
 
     def build(self, clip_id) -> Clip:
         clip_db: ClipDb = self.sqlite_client.select_first(ClipDb, id=clip_id)
@@ -42,8 +42,8 @@ class ClipArtifactBuilder:
 
 
 class TranscriptArtifactBuilder:
-    def __init__(self, file_path_helper: FilePathHelper):
-        self.file_path_builder = file_path_helper
+    def __init__(self, path_helper: PathHelper):
+        self.path_helper = path_helper
 
     def build(self, video_id, start_sec=None, end_sec=None) -> Transcript:
         def calc_diff_time(start_vals, end_vals):
@@ -51,7 +51,7 @@ class TranscriptArtifactBuilder:
             return np.pad(diff_vals, (1, 0))
 
 
-        fp = self.file_path_builder.get_transcript_fp(video_id)
+        fp = self.path_helper.get_transcript_fp(video_id)
         if not fp.exists():
             build_helper = TranscriptBuildHelper()
             build_helper.add_word(Word(
