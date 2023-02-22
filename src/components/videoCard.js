@@ -1,6 +1,6 @@
 import * as React from "react"
 import Grid from "@mui/material/Grid";
-import {Card, CardActionArea, CardMedia, Paper} from "@mui/material";
+import {Card, CardActionArea} from "@mui/material";
 import Typography from "@mui/material/Typography";
 import {Link as GatsbyLink} from "gatsby";
 import PersonIcon from '@mui/icons-material/Person';
@@ -13,10 +13,9 @@ const VideoCard = ({clipUrl, imageUrl, title, date, duration, speaker, place}) =
         <Grid item xs={12} sm={6} md={3}>
             <CardActionArea component={GatsbyLink} to={clipUrl}>
                 <Card square elevation={0}>
-                    <CardMedia
-                        sx={{height: 200}}
-                        image={imageUrl}
-                        alt="thumbnail"
+                    <img
+                        loading='lazy' height='200' width='100%' style={{objectFit: 'cover'}}
+                        src={imageUrl} alt="thumbnail"
                     />
                     <Box sx={{paddingX: 1, paddingTop: 1, paddingBottom: 2}}>
                         <Typography

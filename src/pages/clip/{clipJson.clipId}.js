@@ -93,7 +93,7 @@ const ClipPage = ({data}) => {
     }
 
     return (
-        <Box sx={{maxHeight: '100%'}}>
+        <Box sx={{height: '100vh', overflowX: 'hidden'}}>
             <AppTopBar/>
             <Toolbar variant='dense'/>
             <Box sx={{

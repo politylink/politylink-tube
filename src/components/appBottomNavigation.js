@@ -1,34 +1,33 @@
 import BottomNavigation from "@mui/material/BottomNavigation";
 import BottomNavigationAction from "@mui/material/BottomNavigationAction";
-import RestoreIcon from "@mui/icons-material/Restore";
 import {Link} from "gatsby";
-import FavoriteIcon from "@mui/icons-material/Favorite";
-import LocationOnIcon from "@mui/icons-material/LocationOn";
 import * as React from "react";
-import {Paper} from "@mui/material";
 import {BottomPaper} from "../layout/bottomPaper";
+import HomeIcon from '@mui/icons-material/Home';
+import ContentPasteSearchIcon from '@mui/icons-material/ContentPasteSearch';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
 const AppBottomNavigation = ({value}) => {
     return (
         <BottomPaper elevation={3}>
             <BottomNavigation showLabels value={value}>
                 <BottomNavigationAction
-                    label="Recent"
-                    icon={<RestoreIcon/>}
+                    label="ホーム"
+                    icon={<HomeIcon/>}
                     component={Link}
-                    to="/home"
+                    to="/"
                 />
                 <BottomNavigationAction
-                    label="Favorites"
-                    icon={<FavoriteIcon/>}
+                    label="トピック"
+                    icon={<ContentPasteSearchIcon/>}
                     component={Link}
-                    to="/home2"
+                    to="/topic"
                 />
                 <BottomNavigationAction
-                    label="Nearby"
-                    icon={<LocationOnIcon/>}
+                    label="議員"
+                    icon={<AccountCircleIcon/>}
                     component={Link}
-                    to={"/home3"}
+                    to={"/speaker"}
                 />
             </BottomNavigation>
         </BottomPaper>

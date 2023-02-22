@@ -23,7 +23,9 @@
     "gatsby-source-filesystem": "^5.5.0",
     "gatsby-transformer-json": "^5.5.0",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "video.js": "^8.0.3"
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "video.js": "^8.0.4"
   }
 }
