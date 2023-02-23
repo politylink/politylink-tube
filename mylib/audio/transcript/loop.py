@@ -1,3 +1,5 @@
+import numpy as np
+
 import pandas as pd
 
 
@@ -28,8 +30,8 @@ class TranscriptLoopDetector:
 
         out_df = pd.DataFrame(records)
         out_df = out_df[out_df['len'] >= length_thresh]
-        out_df['start_sec'] = out_df['start_ms'] / 1000
-        out_df['end_sec'] = out_df['end_ms'] / 1000
+        out_df['start_sec'] = np.floor(out_df['start_ms'] / 1000).astype(int)
+        out_df['end_sec'] = np.ceil(out_df['end_ms'] / 1000).astype(int)
         out_df = out_df[(out_df['end_sec'] - out_df['start_sec']) >= duration_sec_thresh]
 
         out_df = out_df[['start_sec', 'end_sec', 'text']]

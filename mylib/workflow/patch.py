@@ -39,16 +39,17 @@ class PatchJobScheduler(JobScheduler):
         mp3_fp = data_dir / 'audio.mp3'
         transcript_fp = data_dir / 'transcript.csv'
         patch_fp = data_dir / 'patch.csv'
-        patch_transcript_fp = data_dir / 'transcript_patch.csv'
+        transcript_patch_fp = data_dir / 'transcript_patch.csv'
+        transcript_merged_fp = data_dir / 'transcript_merged.csv'
 
         jobs = [
             DefinePatchJob(transcript_fp, patch_fp)
         ]
 
+        result_fps = []
         if patch_fp.exists():
             patch_df = pd.read_csv(patch_fp)
 
-            result_fps = []
             for _, row in patch_df.iterrows():
                 wav_fp = data_dir / '{}.wav'.format(row['id'])
                 jobs.append(
@@ -57,8 +58,10 @@ class PatchJobScheduler(JobScheduler):
                 jobs.append(WhisperJob(wav_fp=wav_fp, log_fp=log_fp))
                 result_fps.append(WhisperJob.get_result_fp(wav_fp))
 
-            if result_fps:
-                jobs.append(MergeWhisperJob(vad_fp=patch_fp, result_fps=result_fps, out_fp=patch_transcript_fp))
+        if result_fps:
+            jobs.append(MergeWhisperJob(vad_fp=patch_fp, result_fps=result_fps, out_fp=transcript_patch_fp))
+            jobs.append(ApplyPatchJob(transcript_fp=transcript_fp, patch_fp=patch_fp,
+                                      transcript_patch_fp=transcript_patch_fp, out_fp=transcript_merged_fp))
 
         return self.sort_jobs(self.filter_jobs(jobs=jobs))
 
@@ -75,5 +78,29 @@ class DefinePatchJob(PythonOperator):
             loop_df.to_csv(out_fp, index=False)
 
         context.in_fps = [transcript_fp]
+        context.out_fps = [out_fp]
+        super().__init__(main, context=context)
+
+
+class ApplyPatchJob(PythonOperator):
+    def __init__(self, transcript_fp: Path, patch_fp: Path, transcript_patch_fp: Path, out_fp: Path):
+        context = self.init_context(locals())
+
+        def main():
+            print('ApplyPatchJob')
+            transcript_df = pd.read_csv(transcript_fp)
+            patch_df = pd.read_csv(patch_fp)
+            transcript_patch_df = pd.read_csv(transcript_patch_fp)
+
+            transcript_masked_df = transcript_df
+            for start_sec, end_sec in zip(patch_df['start_sec'], patch_df['end_sec']):
+                mask = (transcript_df['start_ms'] >= start_sec * 1000) & (transcript_df['end_ms'] <= end_sec * 1000)
+                transcript_masked_df = transcript_df[~mask]
+
+            out_df = pd.concat([transcript_masked_df, transcript_patch_df])
+            out_df = out_df.sort_values(by='start_ms')
+            out_df.to_csv(out_fp, index=False)
+
+        context.in_fps = [transcript_fp, patch_fp, transcript_patch_fp]
         context.out_fps = [out_fp]
         super().__init__(main, context=context)
