@@ -18,7 +18,7 @@ LOG_FORMAT = '%(asctime)s [%(name)s] %(levelname)s: %(message)s'
 
 def build_requests() -> List[PatchRequest]:
     requests = []
-    client = SqliteClient(host='mini')
+    client = SqliteClient()
     videos = client.select_all(Video)
     for video in videos:
         requests.append(PatchRequest(
@@ -29,7 +29,7 @@ def build_requests() -> List[PatchRequest]:
 
 
 def main():
-    path_helper = PathHelper(host='mini')
+    path_helper = PathHelper()
     scheduler = PatchJobScheduler(path_helper)
     while True:
         requests = build_requests()
