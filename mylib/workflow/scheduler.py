@@ -4,19 +4,20 @@ from mylib.workflow.models import BaseOperator, StatusCode
 
 
 class JobScheduler:
-    def __init__(self):
-        self.failed_jobs = []
+    def __init__(self, force_execute=False):
+        self.force_execute = force_execute
+        self.history = dict()
 
     def schedule(self, **kwargs) -> List[BaseOperator]:
         NotImplementedError
 
-    def record_failed_job(self, job: BaseOperator):
-        self.failed_jobs.append(job)
+    def record(self, job: BaseOperator, status_code: StatusCode):
+        self.history[job] = status_code
 
     def is_valid_job(self, job: BaseOperator):
-        if job in self.failed_jobs:
+        if job in self.history:
             return False
-        if job.pre_execute() != StatusCode.SUCCESS:
+        if job.pre_execute(force_execute=self.force_execute) != StatusCode.SUCCESS:
             return False
         return True
 

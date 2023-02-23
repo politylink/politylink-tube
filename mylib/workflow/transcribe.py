@@ -9,6 +9,7 @@ import pandas as pd
 
 from mylib.audio.models import AudioModel
 from mylib.audio.vad import VoiceActivityDetector
+from mylib.utils.whisper import read_whisper_csv
 from mylib.workflow.models import BaseOperator, BashOperator, PythonOperator, StatusCode
 
 LOGGER = getLogger(__name__)
@@ -103,7 +104,9 @@ class InitDirJob(PythonOperator):
 class AudioDownloadJob(BashOperator):
     def __init__(self, m3u8_url: str, audio_fp: Path):
         context = self.init_context(locals())
+
         bash_command = f'ffmpeg -i {m3u8_url} {audio_fp}'
+
         context.out_fps = [audio_fp]
         super().__init__(bash_command, context=context)
 
@@ -115,6 +118,8 @@ class VADJob(PythonOperator):
         def main():
             audio = AudioModel(audio_fp)
             vad_df = VoiceActivityDetector().detect(audio)
+            vad_df['id'] = [str(i) for i in range(1, len(vad_df) + 1)]
+            vad_df = vad_df[['id', 'start_sec', 'end_sec']]
             vad_df.to_csv(out_fp, index=False)
 
         context.in_fps = [audio_fp]
@@ -169,7 +174,7 @@ class MergeWhisperJob(PythonOperator):
             vad_df = pd.read_csv(vad_fp)
             for _, row in vad_df.iterrows():
                 fp = Path(vad_fp).parent / '{}.wav.csv'.format(row['id'])
-                df = pd.read_csv(fp, skipinitialspace=True, header=None, names=['start_ms', 'end_ms', 'text'])
+                df = read_whisper_csv(fp)
                 df['start_ms'] += row['start_sec'] * 1000
                 df['end_ms'] += row['start_sec'] * 1000
                 dfs.append(df)

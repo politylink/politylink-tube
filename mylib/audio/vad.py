@@ -37,10 +37,9 @@ class VoiceActivityDetector:
             lambda x: self.is_test_noise(db_agg[x['start_frame']:x['end_frame']]), axis=1)
         out_df = out_df[~out_df['is_test_noise']]
 
-        out_df['id'] = range(1, len(out_df) + 1)
         out_df['start_sec'] = out_df['start_frame'] * window_sec - buffer_sec
         out_df['end_sec'] = out_df['end_frame'] * window_sec + buffer_sec
-        out_df = out_df[['id', 'start_sec', 'end_sec']]
+        out_df = out_df[['start_sec', 'end_sec']]
 
         return out_df
 

@@ -32,7 +32,6 @@ class TranscriptLoopDetector:
         out_df['end_sec'] = out_df['end_ms'] / 1000
         out_df = out_df[(out_df['end_sec'] - out_df['start_sec']) >= duration_sec_thresh]
 
-        out_df['id'] = range(1, len(out_df) + 1)
-        out_df = out_df[['id', 'start_sec', 'end_sec', 'text']]
+        out_df = out_df[['start_sec', 'end_sec', 'text']]
 
         return out_df

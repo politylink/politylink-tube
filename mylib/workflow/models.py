@@ -1,3 +1,4 @@
+import dataclasses
 import subprocess
 from dataclasses import dataclass, field
 from enum import IntEnum
@@ -87,6 +88,9 @@ class BashOperator(BaseOperator):
             return self.bash_command == other.bash_command
         return False
 
+    def __hash__(self):
+        return hash(self.bash_command)
+
     def execute(self, **kwargs):
         log_fp = self.context.log_fp or '/dev/null'
         with open(log_fp, 'w') as f:
@@ -100,7 +104,8 @@ class PythonOperator(BaseOperator):
         self.python_callable = python_callable
 
     def __repr__(self):
-        arg_str = ','.join([f'{k}={v}' for k, v in self.context.class_kwargs.items()])
+        arg_str = ','.join(['{}={}'.format(k, self.context.class_kwargs[k])
+                            for k in sorted(self.context.class_kwargs.keys())])
         return f'<{self.context.class_name}({arg_str})>'
 
     def __eq__(self, other):
@@ -108,6 +113,9 @@ class PythonOperator(BaseOperator):
             return (self.context.class_name == other.context.class_name) \
                    and (self.context.class_kwargs == other.context.class_kwargs)
         return False
+
+    def __hash__(self):
+        return hash(self.__repr__())
 
     def execute(self, **kwargs):
         try:

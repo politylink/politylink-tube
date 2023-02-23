@@ -18,39 +18,42 @@ LOG_FORMAT = '%(asctime)s [%(name)s] %(levelname)s: %(message)s'
 
 def build_requests() -> List[PatchRequest]:
     requests = []
-    client = SqliteClient()
+    client = SqliteClient(host=args.host)
     videos = client.select_all(Video)
     for video in videos:
         requests.append(PatchRequest(
             video_id=video.id,
-            datetime=video.datetime
+            datetime=video.datetime,
         ))
     return requests
 
 
 def main():
-    path_helper = PathHelper()
-    scheduler = PatchJobScheduler(path_helper)
+    path_helper = PathHelper(host=args.host)
+    scheduler = PatchJobScheduler(path_helper=path_helper, force_execute=args.force)
+    requests = build_requests()
     while True:
-        requests = build_requests()
         jobs = scheduler.schedule_batch(requests)
+        LOGGER.info(f'found {len(jobs)} jobs')
+
         if not jobs:
             time.sleep(300)
             continue
 
-        LOGGER.info(f'found {len(jobs)} jobs')
         job = jobs[0]
         LOGGER.info(f'run {job}')
-        result = job.run()
+        status_code = job.run(force_execute=args.force)
 
-        if result != StatusCode.SUCCESS:
+        if status_code != StatusCode.SUCCESS:
             LOGGER.error(f'failed to execute {job}')
-            scheduler.record_failed_job(job)
+        scheduler.record(job, status_code)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='')
     parser.add_argument('-v', '--verbose', action='store_true')
+    parser.add_argument('-f', '--force', action='store_true')
+    parser.add_argument('--host')
     args = parser.parse_args()
 
     logging.basicConfig(level=logging.DEBUG if args.verbose else logging.INFO,
