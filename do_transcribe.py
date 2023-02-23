@@ -33,11 +33,11 @@ def main():
     while True:
         requests = build_requests()
         jobs = scheduler.schedule_batch(requests)
-        LOGGER.info(f'found {len(jobs)} jobs')
         if not jobs:
             time.sleep(300)
             continue
 
+        LOGGER.info(f'found {len(jobs)} jobs')
         job = jobs[0]
         LOGGER.info(f'run {job}')
         result = job.run()
