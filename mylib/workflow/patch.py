@@ -64,7 +64,7 @@ class DefinePatchJob(PythonOperator):
             transcript_df = pd.read_csv(transcript_fp)
             loop_df = TranscriptLoopDetector().detect(transcript_df, duration_sec_thresh=30)
             loop_df['start_sec'] -= 90  # add buffer
-            loop_df['end_sec'] = 90
+            loop_df['end_sec'] += 90
             loop_df.to_csv(out_fp, index=False)
 
         context.in_fps = [transcript_fp]
