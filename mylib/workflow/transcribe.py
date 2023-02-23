@@ -11,6 +11,7 @@ from mylib.audio.models import AudioModel
 from mylib.audio.vad import VoiceActivityDetector
 from mylib.utils.whisper import read_whisper_csv
 from mylib.workflow.models import BaseOperator, BashOperator, PythonOperator, StatusCode
+from mylib.workflow.scheduler import JobScheduler
 
 LOGGER = getLogger(__name__)
 
@@ -20,12 +21,10 @@ class TranscribeRequest:
     m3u8_url: str
     out_dir: [Path | str]
     datetime: datetime
+    download_only: bool = False
 
 
-class TranscribeJobScheduler:
-    def __init__(self):
-        self.failed_jobs = []
-
+class TranscribeJobScheduler(JobScheduler):
     def schedule_batch(self, requests: List[TranscribeRequest]) -> List[BaseOperator]:
         jobs = []
         requests = sorted(requests, key=lambda x: x.datetime, reverse=True)  # prioritize the latest when tie-break
@@ -48,8 +47,12 @@ class TranscribeJobScheduler:
         jobs = [
             InitDirJob(out_dir),
             AudioDownloadJob(request.m3u8_url, mp3_fp),
-            VADJob(mp3_fp, vad_fp)
         ]
+
+        if request.download_only:
+            return self.filter_jobs(jobs=jobs)
+
+        jobs.append(VADJob(mp3_fp, vad_fp))
 
         if vad_fp.exists():
             vad_df = pd.read_csv(vad_fp)
@@ -72,18 +75,8 @@ class TranscribeJobScheduler:
             # summarize
             jobs.append(MergeWhisperJob(vad_fp=vad_fp, result_fps=result_fps, out_fp=transcript_fp))
 
-        jobs = list(filter(self.filter_job, jobs))
-        return jobs
+        return self.sort_jobs(self.filter_jobs(jobs=jobs))
 
-    def filter_job(self, job):
-        if job in self.failed_jobs:
-            return False
-        if job.pre_execute() != StatusCode.SUCCESS:
-            return False
-        return True
-
-    def record_failed_job(self, job):
-        self.failed_jobs.append(job)
 
 
 class InitDirJob(PythonOperator):

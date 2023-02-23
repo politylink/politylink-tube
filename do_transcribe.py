@@ -23,7 +23,8 @@ def build_requests() -> List[TranscribeRequest]:
         requests.append(TranscribeRequest(
             m3u8_url=video.m3u8_url,
             out_dir=Path('./out/transcript') / str(video.id),
-            datetime=video.datetime
+            datetime=video.datetime,
+            download_only=args.download
         ))
     return requests
 
@@ -40,16 +41,18 @@ def main():
         LOGGER.info(f'found {len(jobs)} jobs')
         job = jobs[0]
         LOGGER.info(f'run {job}')
-        result = job.run()
-        
-        if result != StatusCode.SUCCESS:
+        status_code = job.run(force_execute=args.force)
+
+        if status_code != StatusCode.SUCCESS:
             LOGGER.error(f'failed to execute {job}')
-            scheduler.record_failed_job(job)
+        scheduler.record(job, status_code)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='')
     parser.add_argument('-v', '--verbose', action='store_true')
+    parser.add_argument('-f', '--force', action='store_true')
+    parser.add_argument('--download', action='store_true')
     args = parser.parse_args()
 
     logging.basicConfig(level=logging.DEBUG if args.verbose else logging.INFO,
