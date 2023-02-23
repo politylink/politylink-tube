@@ -57,9 +57,9 @@ def remove_symbol(text):
 
 def clean_text(text):
     if is_moderator(text):
-        # remarks from moderator are often wrapped by symbols, we can safely strip them
+        # remarks from moderator are often wrapped by symbols, we can safely strip them all
         return remove_symbol(text)
-    return mask_phrase(text)  # apply passive mask
+    return mask_phrase(text)  # apply passive masking
 
 
 def is_moderator(text):

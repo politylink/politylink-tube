@@ -16,6 +16,9 @@ class PathHelper:
         sqlite_fp = self.root_dir / 'db/local.db'
         return f'sqlite:///{sqlite_fp}'
 
+    def get_work_dir(self, video_id: int) -> Path:
+        return self.root_dir / f'transcript/{video_id}'
+
     def get_transcript_fp(self, video_id: int) -> Path:
         return self.root_dir / f'transcript/{video_id}/data/transcript.csv'
 
