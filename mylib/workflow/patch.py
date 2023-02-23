@@ -87,7 +87,6 @@ class ApplyPatchJob(PythonOperator):
         context = self.init_context(locals())
 
         def main():
-            print('ApplyPatchJob')
             transcript_df = pd.read_csv(transcript_fp)
             patch_df = pd.read_csv(patch_fp)
             transcript_patch_df = pd.read_csv(transcript_patch_fp)
@@ -99,6 +98,9 @@ class ApplyPatchJob(PythonOperator):
 
             out_df = pd.concat([transcript_masked_df, transcript_patch_df])
             out_df = out_df.sort_values(by='start_ms')
+            out_df['start_ms'] = out_df['start_ms'].astype(int)
+            out_df['end_ms'] = out_df['end_ms'].astype(int)
+            out_df = out_df[['start_ms', 'end_ms', 'text']]
             out_df.to_csv(out_fp, index=False)
 
         context.in_fps = [transcript_fp, patch_fp, transcript_patch_fp]
