@@ -41,7 +41,7 @@ class TranscribeJobScheduler(JobScheduler):
         vad_fp = data_dir / 'vad.csv'
         transcript_fp = data_dir / 'transcript.csv'
 
-        if transcript_fp.exists():
+        if not request.download_only and transcript_fp.exists():
             return list()
 
         jobs = [
