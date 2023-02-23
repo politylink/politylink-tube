@@ -4,14 +4,17 @@ import Container from "@mui/material/Container";
 import {Alert} from "@mui/material";
 
 
-const TopicPage = () => {
+const NotFoundPage = () => {
     return (
-        <HomeLayout value={1}>
+        <HomeLayout value={3}>
             <Container maxWidth="lg" sx={{padding: 0}}>
-                <Alert severity="info">このページにはトピックごとに分けられた短編動画が追加される予定です。</Alert>
+                <Alert severity="error">ページが見つかりませんでした。</Alert>
             </Container>
         </HomeLayout>
+
     )
 }
 
-export default TopicPage;
+export default NotFoundPage
+
+export const Head = () => <title>Not found</title>
