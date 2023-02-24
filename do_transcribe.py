@@ -33,13 +33,18 @@ def build_requests() -> List[TranscribeRequest]:
 def main():
     path_helper = PathHelper(host=args.host)
     scheduler = TranscribeJobScheduler(path_helper=path_helper, force_execute=args.force)
+    is_sleeping = False
     while True:
         requests = build_requests()
         jobs = scheduler.schedule_batch(requests)
         if not jobs:
+            if not is_sleeping:
+                LOGGER.info('found 0 jobs. start sleeping')
+                is_sleeping = True
             time.sleep(300)
             continue
 
+        is_sleeping = False
         LOGGER.info(f'found {len(jobs)} jobs')
         job = jobs[0]
         LOGGER.info(f'run {job}')
