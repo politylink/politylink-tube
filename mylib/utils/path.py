@@ -20,7 +20,11 @@ class PathHelper:
         return self.root_dir / f'transcript/{video_id}'
 
     def get_transcript_fp(self, video_id: int) -> Path:
-        return self.root_dir / f'transcript/{video_id}/data/transcript.csv'
+        raw_fp = self.root_dir / f'transcript/{video_id}/data/transcript.csv'
+        merged_fp = self.root_dir / f'transcript/{video_id}/data/transcript_merged.csv'
+        if merged_fp.exists():
+            return merged_fp
+        return raw_fp
 
     def get_clip_fp(self, clip_id: int) -> Path:
         return self.root_dir / f'artifact/clip/{clip_id}.json'

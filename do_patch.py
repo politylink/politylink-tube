@@ -19,7 +19,10 @@ LOG_FORMAT = '%(asctime)s [%(name)s] %(levelname)s: %(message)s'
 def build_requests() -> List[PatchRequest]:
     requests = []
     client = SqliteClient(host=args.host)
-    videos = client.select_all(Video)
+    if args.video:
+        videos = client.select_all(Video, id=args.video)
+    else:
+        videos = client.select_all(Video)
     for video in videos:
         requests.append(PatchRequest(
             video_id=video.id,
@@ -54,6 +57,7 @@ if __name__ == '__main__':
     parser.add_argument('-v', '--verbose', action='store_true')
     parser.add_argument('-f', '--force', action='store_true')
     parser.add_argument('--host')
+    parser.add_argument('--video', help='video id')
     args = parser.parse_args()
 
     logging.basicConfig(level=logging.DEBUG if args.verbose else logging.INFO,
