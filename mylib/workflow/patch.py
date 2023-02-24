@@ -63,7 +63,10 @@ class PatchJobScheduler(JobScheduler):
             jobs.append(ApplyPatchJob(transcript_fp=transcript_fp, patch_fp=patch_fp,
                                       transcript_patch_fp=transcript_patch_fp, out_fp=transcript_merged_fp))
 
-        return self.sort_jobs(self.filter_jobs(jobs=jobs))
+        jobs = self.filter_jobs(jobs)
+        if not self.force_execute:  # do not sort to avoid running downstream jobs with previous outputs
+            jobs = self.sort_jobs(jobs)
+        return jobs
 
 
 class DefinePatchJob(PythonOperator):
