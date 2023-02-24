@@ -2,7 +2,7 @@ import argparse
 import logging
 from logging import getLogger
 
-from mylib.workflow.sync import SyncDirJob
+from mylib.workflow.jobs import SyncDirJob
 
 LOGGER = getLogger(__name__)
 

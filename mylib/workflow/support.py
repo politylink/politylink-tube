@@ -2,7 +2,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import List
 
-from mylib.workflow.models import BaseOperator, BashOperator
+from mylib.workflow.jobs import ScpJob
+from mylib.workflow.models import BaseOperator
 from mylib.workflow.transcribe import InitDirJob, WhisperJob
 
 
@@ -32,11 +33,3 @@ class SupportTranscribeJobScheduler:
             ScpJob(local_log_fp, f'{request.remote_address}:{remote_log_fp}')
         ]
         return jobs
-
-
-class ScpJob(BashOperator):
-    def __init__(self, src_fp: [Path | str], trg_fp: [Path | str]):
-        context = self.init_context(locals())
-        bash_command = f'scp {src_fp} {trg_fp}'
-        context.in_fps = [src_fp] if ('@' not in str(src_fp)) else []  # check if sending from local
-        super().__init__(bash_command, context=context)

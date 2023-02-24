@@ -25,4 +25,9 @@ class JobScheduler:
         return list(filter(self.is_valid_job, jobs))
 
     def sort_jobs(self, jobs: List[BaseOperator]) -> List[BaseOperator]:
+        if self.force_execute:  # do not sort to avoid running downstream jobs with previous outputs
+            return jobs
         return sorted(jobs, key=lambda x: x.context.priority, reverse=True)
+
+    def return_jobs(self, jobs: List[BaseOperator]) -> List[BaseOperator]:
+        return self.sort_jobs(self.filter_jobs(jobs))

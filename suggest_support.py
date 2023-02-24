@@ -1,11 +1,12 @@
 from pathlib import Path
 
 from do_transcribe import build_requests
+from mylib.utils.path import PathHelper
 from mylib.workflow.transcribe import TranscribeJobScheduler, WhisperJob
 
 
 def main():
-    scheduler = TranscribeJobScheduler()
+    scheduler = TranscribeJobScheduler(path_helper=PathHelper())
     requests = build_requests()
     jobs = scheduler.schedule_batch(requests)
     whisper_jobs = list(filter(lambda x: isinstance(x, WhisperJob), jobs))[::-1]

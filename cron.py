@@ -4,7 +4,7 @@ from pathlib import Path
 
 from mylib.sqlite.client import SqliteClient
 from mylib.sqlite.schema import Video
-from mylib.workflow.cron import ShugiinTvJob, SangiinTvJob
+from mylib.workflow.jobs import ShugiinTvJob, SangiinTvJob
 
 TODAY = datetime.now().date()
 TOMORROW = TODAY + timedelta(1)

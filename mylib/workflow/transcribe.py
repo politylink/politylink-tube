@@ -1,4 +1,3 @@
-import os
 from dataclasses import dataclass
 from datetime import datetime
 from logging import getLogger
@@ -7,10 +6,10 @@ from typing import List
 
 import pandas as pd
 
-from mylib.audio.models import AudioModel
-from mylib.audio.vad import VoiceActivityDetector
-from mylib.utils.whisper import read_whisper_csv
-from mylib.workflow.models import BaseOperator, BashOperator, PythonOperator, StatusCode
+from mylib.utils.path import PathHelper
+from mylib.workflow.jobs import InitDirJob, AudioDownloadJob, VADJob, AudioSplitJob, WhisperJob, MergeWhisperJob
+from mylib.workflow.models import BaseOperator
+from mylib.workflow.patch import PatchJobScheduler, PatchRequest
 from mylib.workflow.scheduler import JobScheduler
 
 LOGGER = getLogger(__name__)
@@ -18,13 +17,18 @@ LOGGER = getLogger(__name__)
 
 @dataclass
 class TranscribeRequest:
-    m3u8_url: str
-    out_dir: [Path | str]
+    video_id: int
     datetime: datetime
+    m3u8_url: str
     download_only: bool = False
 
 
 class TranscribeJobScheduler(JobScheduler):
+    def __init__(self, path_helper: PathHelper, **kwargs):
+        self.path_helper = path_helper
+        self.patch_job_scheduler = PatchJobScheduler(path_helper, **kwargs)
+        super().__init__(**kwargs)
+
     def schedule_batch(self, requests: List[TranscribeRequest]) -> List[BaseOperator]:
         jobs = []
         requests = sorted(requests, key=lambda x: x.datetime, reverse=True)  # prioritize the latest when tie-break
@@ -34,147 +38,50 @@ class TranscribeJobScheduler(JobScheduler):
         return jobs
 
     def schedule(self, request: TranscribeRequest) -> List[BaseOperator]:
-        out_dir = Path(request.out_dir)
-        data_dir = out_dir / 'data'
-        log_dir = out_dir / 'log'
+        work_dir = Path(self.path_helper.get_work_dir(video_id=request.video_id))
+        data_dir = work_dir / 'data'
+        log_dir = work_dir / 'log'
         mp3_fp = data_dir / 'audio.mp3'
         vad_fp = data_dir / 'vad.csv'
         transcript_fp = data_dir / 'transcript.csv'
 
-        if not request.download_only and transcript_fp.exists():
+        if not request.download_only and transcript_fp.exists():  # TODO: fix this as we now have patch step
             return list()
 
         jobs = [
-            InitDirJob(out_dir),
+            InitDirJob(work_dir),
             AudioDownloadJob(request.m3u8_url, mp3_fp),
         ]
-
         if request.download_only:
-            return self.filter_jobs(jobs=jobs)
+            return self.return_jobs(jobs)
 
         jobs.append(VADJob(mp3_fp, vad_fp))
+        if not vad_fp.exists():
+            return self.return_jobs(jobs)
 
-        if vad_fp.exists():
-            vad_df = pd.read_csv(vad_fp)
+        result_fps = []
+        vad_df = pd.read_csv(vad_fp)
+        for _, row in vad_df.iterrows():
+            wav_fp = data_dir / '{}.wav'.format(row['id'])
+            log_fp = log_dir / 'whisper_{}.log'.format(row['id'])
+            result_fp = WhisperJob.get_result_fp(wav_fp)
+            result_fps.append(result_fp)
 
-            # generate wav files
-            wav_fps = []
-            for _, row in vad_df.iterrows():
-                wav_fp = data_dir / '{}.wav'.format(row['id'])
-                wav_fps.append(wav_fp)
-                jobs.append(AudioSplitJob(audio_fp=mp3_fp, start_sec=row['start_sec'],
-                                          end_sec=row['end_sec'], out_fp=wav_fp))
+            if not result_fp.exists() or self.force_execute:
+                # avoid generating .wav files after cleanup.
+                # Maybe we can define a single merged job to avoid such adhoc logic?
+                jobs += [
+                    AudioSplitJob(audio_fp=mp3_fp, start_sec=row['start_sec'], end_sec=row['end_sec'], out_fp=wav_fp),
+                    WhisperJob(wav_fp=wav_fp, log_fp=log_fp)
+                ]
 
-            # transcribe by whisper
-            result_fps = []
-            for wav_fp in wav_fps:
-                log_fp = log_dir / 'whisper_{}.log'.format(wav_fp.stem)
-                result_fps.append(WhisperJob.get_result_fp(wav_fp))
-                jobs.append(WhisperJob(wav_fp, log_fp))
+        # summarize
+        jobs.append(MergeWhisperJob(vad_fp=vad_fp, result_fps=result_fps, out_fp=transcript_fp))
+        if not transcript_fp.exists():
+            return self.return_jobs(jobs)
 
-            # summarize
-            jobs.append(MergeWhisperJob(vad_fp=vad_fp, result_fps=result_fps, out_fp=transcript_fp))
-
-        return self.sort_jobs(self.filter_jobs(jobs=jobs))
-
-
-
-class InitDirJob(PythonOperator):
-    def __init__(self, out_dir: Path):
-        context = self.init_context(locals())
-
-        def main():
-            log_dir.mkdir(parents=True, exist_ok=True)
-            data_dir.mkdir(parents=True, exist_ok=True)
-
-        log_dir = Path(out_dir) / 'log'
-        data_dir = Path(out_dir) / 'data'
-
-        context.out_fps = [log_dir, data_dir]
-        super().__init__(main, context=context)
-
-
-class AudioDownloadJob(BashOperator):
-    def __init__(self, m3u8_url: str, audio_fp: Path):
-        context = self.init_context(locals())
-
-        bash_command = f'ffmpeg -i {m3u8_url} {audio_fp}'
-
-        context.out_fps = [audio_fp]
-        super().__init__(bash_command, context=context)
-
-
-class VADJob(PythonOperator):
-    def __init__(self, audio_fp: Path, out_fp: Path):
-        context = self.init_context(locals())
-
-        def main():
-            audio = AudioModel(audio_fp)
-            vad_df = VoiceActivityDetector().detect(audio)
-            vad_df['id'] = [str(i) for i in range(1, len(vad_df) + 1)]
-            vad_df = vad_df[['id', 'start_sec', 'end_sec']]
-            vad_df.to_csv(out_fp, index=False)
-
-        context.in_fps = [audio_fp]
-        context.out_fps = [out_fp]
-        super().__init__(main, context=context)
-
-
-class AudioSplitJob(BashOperator):
-    def __init__(self, audio_fp: Path, start_sec: int, end_sec: int, out_fp: Path):
-        context = self.init_context(locals())
-
-        duration = end_sec - start_sec
-        # split and convert to 16-bit WAV as specified by whisper.cpp
-        # https://github.com/ggerganov/whisper.cpp
-        bash_command = f'ffmpeg -y -ss {start_sec} -i {audio_fp} -t {duration} -ar 16000 -ac 1 -c:a pcm_s16le {out_fp}'
-
-        context.in_fps = [audio_fp]
-        context.out_fps = [out_fp]
-        super().__init__(bash_command, context=context)
-
-
-class WhisperJob(BashOperator):
-    def __init__(self, wav_fp: Path, log_fp: Path, model: str = 'large'):
-        context = self.init_context(locals())
-
-        wav_fp = Path(wav_fp)
-        whisper_dir = Path(os.environ['WHISPER_ROOT'])
-        bin_fp = whisper_dir / 'main'
-        model_fp = whisper_dir / f'models/ggml-{model}.bin'
-        result_fp = self.get_result_fp(wav_fp)
-        prompt = "静粛に。これより、会議を開きます。"  # prompt to include punctuation marks
-        bash_command = f'{bin_fp} --model {model_fp} --language ja --file {wav_fp} --output-csv　--prompt {prompt}'
-
-        context.in_fps = [wav_fp]
-        context.out_fps = [result_fp]
-        context.log_fp = log_fp
-        context.priority = -100  # de-prioritize to download & split all audio first
-        super().__init__(bash_command, context=context)
-
-    @staticmethod
-    def get_result_fp(wav_fp: [str | Path]) -> Path:
-        wav_fp = Path(wav_fp)
-        return wav_fp.parent / (wav_fp.name + '.csv')  # whisper.cpp generate this file with `--output-csv`
-
-
-class MergeWhisperJob(PythonOperator):
-    def __init__(self, vad_fp: Path, result_fps: List[Path], out_fp: Path):
-        context = self.init_context(locals())
-
-        def main():
-            dfs = []
-            vad_df = pd.read_csv(vad_fp)
-            for _, row in vad_df.iterrows():
-                fp = Path(vad_fp).parent / '{}.wav.csv'.format(row['id'])
-                df = read_whisper_csv(fp)
-                df['start_ms'] += row['start_sec'] * 1000
-                df['end_ms'] += row['start_sec'] * 1000
-                dfs.append(df)
-
-            out_df = pd.concat(dfs, axis=0).reset_index(drop=True)
-            out_df.to_csv(out_fp, index=False)
-
-        context.in_fps = [vad_fp] + result_fps
-        context.out_fps = [out_fp]
-        super().__init__(main, context=context)
+        jobs += self.patch_job_scheduler.schedule(PatchRequest(
+            video_id=request.video_id,
+            datetime=request.datetime
+        ))
+        return self.return_jobs(jobs)
