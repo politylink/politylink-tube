@@ -25,7 +25,7 @@ SYMBOL_RIGHT = '\])）】'
 def build_mask_phrase_pattern():
     phrases = [
         '拍手', '記者', '笑', '委員長', '字幕視聴ありがとうございました', '御静聴', '音声なし', '間', '司会', '質疑応答',
-        '小声', '質問'
+        '小声', '質問', '会議の音声', '会議の音'
     ]
     pattern = r'[{0}]+\s*({1})\s*[{2}]+'.format(SYMBOL_LEFT, '|'.join(phrases), SYMBOL_RIGHT)
     return re.compile(pattern)

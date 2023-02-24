@@ -20,7 +20,8 @@ def build_requests() -> List[PatchRequest]:
     requests = []
     client = SqliteClient(host=args.host)
     if args.video:
-        videos = client.select_all(Video, id=args.video)
+        video_ids = list(map(int, args.video.split(',')))
+        client.session.query(Video).filter(Video.id.in_(video_ids)).all()
     else:
         videos = client.select_all(Video)
     for video in videos:
@@ -57,7 +58,7 @@ if __name__ == '__main__':
     parser.add_argument('-v', '--verbose', action='store_true')
     parser.add_argument('-f', '--force', action='store_true')
     parser.add_argument('--host')
-    parser.add_argument('--video', help='video id')
+    parser.add_argument('--video', help='comma separated list of video ids')
     args = parser.parse_args()
 
     logging.basicConfig(level=logging.DEBUG if args.verbose else logging.INFO,
