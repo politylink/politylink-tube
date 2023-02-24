@@ -29,7 +29,8 @@ class PatchJobScheduler(JobScheduler):
         requests = sorted(requests, key=lambda x: x.datetime, reverse=True)  # prioritize the latest when tie-break
         for job_input in requests:
             jobs += self.schedule(job_input)
-        jobs = sorted(jobs, key=lambda x: x.context.priority, reverse=True)
+        if not self.force_execute:  # do not sort to avoid running downstream jobs with previous outputs
+            jobs = self.sort_jobs(jobs)
         return jobs
 
     def schedule(self, request: PatchRequest) -> List[BaseOperator]:
