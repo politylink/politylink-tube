@@ -75,9 +75,10 @@ class BaseOperator:
 
 
 class BashOperator(BaseOperator):
-    def __init__(self, bash_command: str, **kwargs):
+    def __init__(self, bash_command: str, cwd='.', **kwargs):
         super().__init__(**kwargs)
         self.bash_command = bash_command
+        self.cwd = cwd
 
     def __repr__(self):
         return f'<$ {self.bash_command}>'
@@ -93,7 +94,7 @@ class BashOperator(BaseOperator):
     def execute(self, **kwargs):
         log_fp = self.context.log_fp or '/dev/null'
         with open(log_fp, 'w') as f:
-            subprocess.run(self.bash_command.split(), stdout=f, stderr=f, encoding='utf-8')
+            subprocess.run(self.bash_command, shell=True, cwd=self.cwd, stdout=f, stderr=f, encoding='utf-8')
         return StatusCode.SUCCESS  # TODO: check run result
 
 

@@ -206,3 +206,44 @@ class SangiinTvJob(BashOperator):
 
         context.log_fp = log_fp
         super().__init__(bash_command=bash_command, context=context)
+
+
+class GatsbyDeployJob(BashOperator):
+    def __init__(self, log_fp):
+        context = self.init_context(locals())
+
+        bash_command = 'npm run deploy'
+        cwd = Path().home() / 'politylink/politylink-player'
+
+        context.log_fp = log_fp
+        super().__init__(bash_command=bash_command, cwd=cwd, context=context)
+
+
+class GenerateClipsJob(BashOperator):
+    def __init__(self, log_fp):
+        context = self.init_context(locals())
+
+        bash_command = 'poetry run python generate_clips.py'
+
+        context.log_fp = log_fp
+        super().__init__(bash_command=bash_command, context=context)
+
+
+class GenerateImagesJob(BashOperator):
+    def __init__(self, log_fp):
+        context = self.init_context(locals())
+
+        bash_command = 'poetry run python generate_images.py --clip --publish'
+
+        context.log_fp = log_fp
+        super().__init__(bash_command=bash_command, context=context)
+
+
+class BuildArtifactJob(BashOperator):
+    def __init__(self, log_fp):
+        context = self.init_context(locals())
+
+        bash_command = 'poetry run python build_artifact.py'
+
+        context.log_fp = log_fp
+        super().__init__(bash_command=bash_command, context=context)
