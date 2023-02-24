@@ -45,9 +45,6 @@ class TranscribeJobScheduler(JobScheduler):
         vad_fp = data_dir / 'vad.csv'
         transcript_fp = data_dir / 'transcript.csv'
 
-        if not request.download_only and transcript_fp.exists():  # TODO: fix this as we now have patch step
-            return list()
-
         jobs = [
             InitDirJob(work_dir),
             AudioDownloadJob(request.m3u8_url, mp3_fp),
