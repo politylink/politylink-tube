@@ -21,7 +21,7 @@ def build_requests() -> List[PatchRequest]:
     client = SqliteClient(host=args.host)
     if args.video:
         video_ids = list(map(int, args.video.split(',')))
-        client.session.query(Video).filter(Video.id.in_(video_ids)).all()
+        videos = client.session.query(Video).filter(Video.id.in_(video_ids)).all()
     else:
         videos = client.select_all(Video)
     for video in videos:
