@@ -10,7 +10,7 @@ LOGGER = getLogger(__name__)
 def main():
     jobs = [
         SyncDirJob(
-            src_dir=f'mitsuki@{args.host}:~/politylink/politylink-press/out/',
+            src_dir=f'mitsuki@{args.host}:~/politylink/politylink-tube/builder/out/',
             dest_dir=f'./out_{args.host}'
         )
     ]

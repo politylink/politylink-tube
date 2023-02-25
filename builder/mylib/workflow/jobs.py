@@ -213,7 +213,7 @@ class GatsbyDeployJob(BashOperator):
         context = self.init_context(locals())
 
         bash_command = 'npm run deploy'
-        cwd = Path().home() / 'politylink/politylink-player'
+        cwd = Path().home() / 'politylink/politylink-tube/frontend'
 
         context.log_fp = log_fp
         super().__init__(bash_command=bash_command, cwd=cwd, context=context)

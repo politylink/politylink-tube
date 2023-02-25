@@ -1,5 +1,5 @@
 # crontab -e
-# */30 * * * * /bin/zsh ~/politylink/politylink-press/cron.sh &> ~/politylink/politylink-press/out/cron/log/cron.log
+# */30 * * * * /bin/zsh ~/politylink/politylink-tube/builder/cron.sh &> ~/politylink/politylink-tube/builder/out/cron/log/cron.log
 
 set -ue
 
@@ -7,5 +7,5 @@ set -ue
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
-cd ~/politylink/politylink-press
+cd ~/politylink/politylink-tube/builder
 poetry run python cron.py # make sure to add poetry path in .zshenv
