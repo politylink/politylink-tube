@@ -1,0 +1,1 @@
+ALTER TABLE clip ADD COLUMN type Integer;

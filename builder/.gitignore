@@ -1,0 +1,13 @@
+*.log
+.python-version
+*.ipynb
+.ipynb_checkpoints
+__pycache__/
+.idea
+gpt_index/
+out*/
+.venv/
+.DS_Store
+*.db
+.scrapy
+data/support.csv
