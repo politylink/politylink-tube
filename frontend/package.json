@@ -1,8 +1,8 @@
 {
-  "name": "politylink-video",
+  "name": "politylink-tube",
   "version": "1.0.0",
   "private": true,
-  "description": "politylink-video",
+  "description": "politylink-tube",
   "author": "MitsukiUsui",
   "keywords": [
     "gatsby"
