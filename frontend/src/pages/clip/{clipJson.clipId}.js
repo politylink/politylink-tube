@@ -13,6 +13,8 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import ShareIcon from '@mui/icons-material/Share';
 import Link from "@mui/material/Link";
+import SEO from "../../components/seo";
+import {buildClipPageDescription, buildClipPageTitle} from "../../utils/seoUtils";
 
 const ClipPage = ({data}) => {
     const theme = useTheme();
@@ -193,3 +195,15 @@ export const query = graphql`
         }   
     }
 `
+
+export const Head = ({location, data}) => {
+    const clip = data.clipJson
+    return (
+        <SEO
+            title={buildClipPageTitle(clip.title)}
+            description={buildClipPageDescription(clip.title, clip.video.date)}
+            path={location.pathname}
+        />
+    )
+}
+

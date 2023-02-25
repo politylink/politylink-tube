@@ -5,6 +5,7 @@ import Grid from "@mui/material/Grid";
 import VideoCard from "../components/videoCard";
 import {graphql} from 'gatsby'
 import {buildClipImageUrl, buildClipUrl} from "../utils/urlUtils";
+import SEO from "../components/seo";
 
 
 const IndexPage = ({data}) => {
@@ -50,3 +51,9 @@ export const query = graphql`
 
 
 export default IndexPage;
+
+export const Head = () => {
+    return (
+        <SEO />
+    )
+}

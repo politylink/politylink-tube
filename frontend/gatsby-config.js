@@ -3,8 +3,12 @@
  */
 module.exports = {
     siteMetadata: {
-        title: `politylink-video`,
-        siteUrl: `https://www.yourdomain.tld`,
+        title: `PolityLink｜国会を、もっとおもしろく。`,
+        description: `PolityLink（ポリティリンク）は、国会をあなたの身近なものへと変える動画サイトです。国会中継がクリップ（短編動画）として切り出され、トピックごとに整理されているため、注目の話題や、気になる議題を簡単にチェックできます。`,
+        twitterUsername: `@politylink`,
+        twitterCard: `summary`,
+        siteUrl: `https://politylink.jp`,
+        imageUrl: `https://image.politylink.jp/clips/summary.jpg`
     },
     plugins: [
         `gatsby-transformer-json`,
