@@ -1,12 +1,12 @@
-## 概要
+# 概要
 
 このディレクトリにはPolityLinkのフロントエンドのコードが置かれています。Gatsbyという静的サイトジェネレーターを使い、builderが生成したデータからページを作成します。
 
-## 環境構築
+# 環境構築
 
 記載のコードはMacOSに環境構築する場合です。適宜読み替えて実行してください。
 
-### Gatsby
+## Gatsby
 
 [Gatsby](https://www.gatsbyjs.com/docs/tutorial/part-0/)をインストールします。最新の情報は公式サイトを参照してください。
 
@@ -29,9 +29,9 @@ npm install -g gatsby-cli
 npm install
 ```
 
-## 実行
+# 実行
 
-### データの準備
+## データの準備
 
 builderが生成したデータを`artifact`というディレクトリに置く必要があります。builderがローカルで生成しているファイルを参照する場合は、シンボリックリンクを貼ると便利です。
 
@@ -39,7 +39,7 @@ builderが生成したデータを`artifact`というディレクトリに置く
 ln -s ../builder/out/artifact artifact
 ```
 
-### サイトの立ち上げ
+## サイトの立ち上げ
 開発時は`develop`コマンドが便利です。
 
 ```
