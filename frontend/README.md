@@ -40,7 +40,7 @@ ln -s ../builder/out/artifact artifact
 ```
 
 ## サイトの立ち上げ
-開発時は`develop`コマンドが便利です。
+開発時は`develop`コマンドを使えば http://localhost:8000 のサイトが随時更新されます。
 
 ```
 gatsby develop -H 0.0.0.0

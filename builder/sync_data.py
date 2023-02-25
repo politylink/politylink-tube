@@ -16,8 +16,6 @@ def main():
     ]
     for job in jobs:
         print(job.bash_command)
-        if args.run:
-            job.execute()
 
 
 if __name__ == '__main__':
