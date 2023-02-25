@@ -1,0 +1,33 @@
+{
+  "name": "politylink-video",
+  "version": "1.0.0",
+  "private": true,
+  "description": "politylink-video",
+  "author": "MitsukiUsui",
+  "keywords": [
+    "gatsby"
+  ],
+  "scripts": {
+    "develop": "gatsby develop",
+    "start": "gatsby develop",
+    "build": "gatsby build",
+    "serve": "gatsby serve",
+    "clean": "gatsby clean",
+    "deploy": "npm run -n \"-r dotenv/config\" && npm run build && gatsby-plugin-s3 deploy --yes && aws cloudfront create-invalidation --distribution-id E2BZL0LNXZYLSA --paths \"/*\""
+  },
+  "dependencies": {
+    "@emotion/react": "^11.10.5",
+    "@emotion/styled": "^11.10.5",
+    "@mui/icons-material": "^5.11.0",
+    "@mui/material": "^5.11.7",
+    "gatsby": "^5.5.0",
+    "gatsby-plugin-s3": "^0.3.8",
+    "gatsby-source-filesystem": "^5.5.0",
+    "gatsby-transformer-json": "^5.5.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "video.js": "^8.0.4"
+  }
+}
