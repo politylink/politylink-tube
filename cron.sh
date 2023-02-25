@@ -3,5 +3,9 @@
 
 set -ue
 
+# load NVM for gatsby
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
 cd ~/politylink/politylink-press
 poetry run python cron.py # make sure to add poetry path in .zshenv
