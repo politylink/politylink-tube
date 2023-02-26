@@ -1,9 +1,12 @@
 import re
 from datetime import datetime
 
+DAY_OF_WEEK_LABEL = '月火水木金土日'
+
 
 def format_date(dt: datetime):
-    return dt.strftime('%Y年%m月%d日')
+    dow = DAY_OF_WEEK_LABEL[dt.weekday()]
+    return dt.strftime('%Y年%m月%d日') + f'({dow})'
 
 
 def format_duration(sec: float):
@@ -12,6 +15,18 @@ def format_duration(sec: float):
     sec -= hour * 3600
     minute = sec // 60
     return f'{hour}h{minute}m'
+
+
+def format_time(sec: float):
+    sec = int(sec)
+    hour = sec // 3600
+    sec -= hour * 3600
+    minute = sec // 60
+    sec -= minute * 60
+    if hour:
+        return f'{hour}:{minute:02}:{sec:02}'
+    else:
+        return f'{minute}:{sec:02}'
 
 
 def format_place(house: str, meeting: str):

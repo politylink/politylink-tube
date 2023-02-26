@@ -1,20 +1,19 @@
 import * as React from 'react'
 import {useEffect, useRef, useState} from 'react'
 import {graphql} from 'gatsby'
-import Transcript from "../../components/transcript";
 import * as wordStyles from '../../components/transcriptWord.module.css';
 import videojs from 'video.js';
 import {editWordNodeClass, eqWordPosition, findActiveWordPosition, scrollToWord} from '../../utils/transcriptUtils';
 import {getVideojsOptions} from '../../utils/videoUtils';
 import AppBottomController from "../../components/appBottomController";
 import AppTopBar from "../../components/appTopBar";
-import {Chip, Toolbar, useMediaQuery, useTheme} from "@mui/material";
+import {Toolbar, useMediaQuery, useTheme} from "@mui/material";
 import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
-import ShareIcon from '@mui/icons-material/Share';
-import Link from "@mui/material/Link";
 import SEO from "../../components/seo";
 import {buildClipPageDescription, buildClipPageTitle} from "../../utils/seoUtils";
+import TranscriptPanel from "../../components/transcriptPanel";
+import VideoInfoPanel from "../../components/videoInfoPanel";
+
 
 const ClipPage = ({data}) => {
     const theme = useTheme();
@@ -60,6 +59,7 @@ const ClipPage = ({data}) => {
             editWordNodeClass(transcriptRef.current, activeWordPosition, wordStyles.active);
             editWordNodeClass(transcriptRef.current, activeWordPositionRef.current, wordStyles.active, false);
             activeWordPositionRef.current = activeWordPosition;
+            console.log(isAutoScrollRef.current);
             if (isAutoScrollRef.current) {
                 scrollToWord(transcriptRef.current, activeWordPositionRef.current);
             }
@@ -106,44 +106,34 @@ const ClipPage = ({data}) => {
                 height: isMobile ? 'calc(100vh - 250px)' : 'calc(100vh - 200px)', // TODO: fix hardcoded AppBar + BottomController height
                 transitionDuration: '0.1s',
             }}>
-                <Box sx={{width: '50%', maxWidth: '800px', marginX: 'auto'}}>
-                    <Box ref={videoRef} sx={{maxWidth: '800px', margin: 'auto'}}></Box>
-                    <Box sx={{padding: 1}}>
-                        <Box sx={{display: 'flex', justifyContent: 'center'}}>
-                            <Box sx={{flexGrow: 1}}>
-                                <Typography variant='h5'
-                                            sx={{letterSpacing: -0.05, fontWeight: 'bold', lineHeight: 1.15}}>
-                                    {data.clipJson.title}
-                                </Typography>
-                                <Box sx={{
-                                    marginTop: 0.5,
-                                    display: "flex",
-                                    alignItems: "center",
-                                }}>
-                                    <Typography variant="body1" color="text.secondary">
-                                        {data.clipJson.video.date}
-                                    </Typography>
-                                    <Typography variant="body1" color="text.secondary" sx={{marginLeft: 3}}>
-                                        {data.clipJson.video.duration}
-                                    </Typography>
-                                </Box>
-                            </Box>
-                            <Box sx={{display: 'flex', alignItems: 'center'}}>
-                                <Chip color='primary' icon={<ShareIcon/>} label={'共有'} sx={{marginX: 1}}/>
-                            </Box>
-                        </Box>
-                        <Box sx={{marginTop: 2}}>
-                            <Typography>
-                                【公式サイト】
-                            </Typography>
-                            <Link href={data.clipJson.video.page} target="_blank" rel="noopener">
-                                {data.clipJson.video.page}
-                            </Link>
-                        </Box>
-                    </Box>
+                <Box sx={{
+                    width: '50%',
+                    marginX: 'auto',
+                    overflowX: 'scroll',
+                    height: '100%',
+                    paddingBottom: 6,
+                }}>
+                    <Box ref={videoRef} sx={{
+                        maxWidth: '800px',
+                        margin: 'auto'
+                    }}></Box>
+                    <VideoInfoPanel
+                        title={data.clipJson.title}
+                        date={data.clipJson.video.date}
+                        duration={data.clipJson.video.duration}
+                        pageUrl={data.clipJson.video.page}
+                        annotations={data.clipJson.annotations}
+                        updateTime={updateTimeWithScroll}
+                    />
                 </Box>
-                <Box sx={{width: '50%'}} ref={transcriptRef}>
-                    <Transcript
+                <Box sx={{
+                    width: '50%',
+                    backgroundColor: 'white',
+                    overflowX: 'scroll',
+                    paddingY: 3,
+                    height: '100%',
+                }} ref={transcriptRef}>
+                    <TranscriptPanel
                         utterances={data.clipJson.transcript.utterances}
                         updateTime={updateTimeWithoutScroll}
                         onScroll={() => {
@@ -191,6 +181,11 @@ export const query = graphql`
                         text
                     }
                 }
+            }
+            annotations {
+                start
+                time
+                text
             }
         }   
     }

@@ -34,7 +34,7 @@ class Video(Base, Serializable):
 class Annotation(Base, Serializable):
     __tablename__ = 'annotation'
     id = Column(Integer, primary_key=True)
-    video_id = Column(Integer)
+    video_id = Column(Integer, index=True)
     start_sec = Column(Float)
     end_sec = Column(Float)
     speaker_name = Column(String)
@@ -53,7 +53,7 @@ class Clip(Base, Serializable):
     __tablename__ = 'clip'
     id = Column(Integer, primary_key=True)
     key = Column(String, unique=True)
-    video_id = Column(Integer)
+    video_id = Column(Integer, index=True)
     start_sec = Column(Float)
     end_sec = Column(Float)
     title = Column(String)

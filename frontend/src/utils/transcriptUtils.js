@@ -47,5 +47,5 @@ export const scrollToWord = (transcriptRoot, wordPosition) => {
         return;
     }
     const word = getWordNode(transcriptRoot, wordPosition);
-    transcriptRoot.childNodes[0].scrollTo({top: word.offsetTop - 100, behavior: "auto"});
+    transcriptRoot.scrollTo({top: word.offsetTop - 100, behavior: "auto"});
 }

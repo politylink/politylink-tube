@@ -1,13 +1,13 @@
-import re
+from typing import List
 
 import numpy as np
 import pandas as pd
 
 from mylib.artifact.helpers import TranscriptBuildHelper
-from mylib.artifact.models import Video, Clip, Transcript, Word
-from mylib.artifact.utils import format_date, format_duration, clean_text, is_moderator
+from mylib.artifact.models import Video, Clip, Transcript, Word, Annotation
+from mylib.artifact.utils import format_date, format_duration, clean_text, is_moderator, format_time
 from mylib.sqlite.client import SqliteClient
-from mylib.sqlite.schema import Clip as ClipDb, Video as VideoDb
+from mylib.sqlite.schema import Clip as ClipDb, Video as VideoDb, Annotation as AnnotationDb
 from mylib.utils.path import PathHelper
 
 
@@ -19,8 +19,10 @@ class ClipArtifactBuilder:
     def build(self, clip_id) -> Clip:
         clip_db: ClipDb = self.sqlite_client.select_first(ClipDb, id=clip_id)
         video_db: VideoDb = self.sqlite_client.select_first(VideoDb, id=clip_db.video_id)
+        annotation_dbs: List[AnnotationDb] = self.sqlite_client.select_all(AnnotationDb, video_id=clip_db.video_id)
 
         video = Video(
+            video_id=video_db.id,
             url=video_db.m3u8_url,
             page=video_db.page_url,
             start=clip_db.start_sec,
@@ -33,12 +35,27 @@ class ClipArtifactBuilder:
             start_sec=clip_db.start_sec,
             end_sec=clip_db.end_sec
         )
+        annotations = [convert_annotation(annotation_db) for annotation_db in annotation_dbs]
+
         return Clip(
             clip_id=clip_id,
             title=clip_db.title,
             video=video,
             transcript=transcript,
+            annotations=annotations
         )
+
+
+def convert_annotation(annotation_db: AnnotationDb) -> Annotation:
+    text = annotation_db.speaker_name
+    if annotation_db.speaker_info:
+        text += f'（{annotation_db.speaker_info}）'
+
+    return Annotation(
+        start=annotation_db.start_sec,
+        time=format_time(annotation_db.start_sec),
+        text=text
+    )
 
 
 class TranscriptArtifactBuilder:
@@ -49,7 +66,6 @@ class TranscriptArtifactBuilder:
         def calc_diff_time(start_vals, end_vals):
             diff_vals = start_vals[1:] - end_vals[:-1]
             return np.pad(diff_vals, (1, 0))
-
 
         fp = self.path_helper.get_transcript_fp(video_id)
         if not fp.exists():

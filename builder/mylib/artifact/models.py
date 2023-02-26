@@ -6,6 +6,7 @@ from pydantic import BaseModel, Field
 
 
 class Video(BaseModel):
+    video_id: int = Field(0, alias='videoId')
     url: str = ''
     page: str = ''
     start: float = 0.
@@ -14,6 +15,9 @@ class Video(BaseModel):
     duration: str = ''
     place: str = ''
     speaker: str = ''
+
+    class Config:
+        allow_population_by_field_name = True
 
 
 class Word(BaseModel):
@@ -41,11 +45,19 @@ class Transcript(BaseModel):
         return len(self.utterances)
 
 
+class Annotation(BaseModel):
+    start: float = 0.
+    end: float = 0.
+    time: str = ''
+    text: str = ''
+
+
 class Clip(BaseModel):
     clip_id: int = Field(0, alias='clipId')
     title: str = ''
     video: Video = Field(default_factory=Video)
     transcript: Transcript = Field(default_factory=Transcript)
+    annotations: List[Annotation] = Field(default_factory=list)
 
     class Config:
         allow_population_by_field_name = True
