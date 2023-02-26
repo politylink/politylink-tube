@@ -132,13 +132,14 @@ const ClipPage = ({data}) => {
                     overflowX: 'scroll',
                     paddingY: 3,
                     height: '100%',
-                }} ref={transcriptRef}>
+                }}
+                     onScroll={() => {
+                         isAutoScrollRef.current = false;
+                     }}
+                     ref={transcriptRef}>
                     <TranscriptPanel
                         utterances={data.clipJson.transcript.utterances}
                         updateTime={updateTimeWithoutScroll}
-                        onScroll={() => {
-                            isAutoScrollRef.current = false;
-                        }}
                     />
                 </Box>
             </Box>

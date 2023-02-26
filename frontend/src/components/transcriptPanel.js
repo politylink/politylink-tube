@@ -7,7 +7,7 @@ class TranscriptPanel extends PureComponent {
         return (
             <Box sx={{
                 paddingX: {xs: 3, sm: 3, md: 5},
-            }} onScroll={this.props.onScroll}>
+            }}>
                 {this.props.utterances.map(({start, end, words}, i) => (
                     <TranscriptUtterance
                         key={i}
