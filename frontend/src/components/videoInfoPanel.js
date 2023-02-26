@@ -50,10 +50,10 @@ const VideoInfoPanel = ({title, date, duration, pageUrl, annotations, updateTime
                 </Typography>
                 {annotations.map(({start, time, text}, i) => (
                     <Box sx={{display: 'flex', marginY: 0, alignItems: 'start'}} key={i}>
-                        <Link component="button" variant="body1" underline="hover" onClick={() => updateTime(start)} color='primary'>
+                        <Link component="button" variant="body2" underline="hover" onClick={() => updateTime(start)} color='primary'>
                             {time}
                         </Link>
-                        <Typography sx={{marginLeft: 1}}>
+                        <Typography sx={{marginLeft: 1}} variant='body2'>
                             {text}
                         </Typography>
                     </Box>
