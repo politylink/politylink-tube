@@ -21,6 +21,7 @@
     "@mui/icons-material": "^5.11.0",
     "@mui/material": "^5.11.7",
     "gatsby": "^5.5.0",
+    "gatsby-plugin-google-gtag": "^5.7.0",
     "gatsby-plugin-s3": "^0.3.8",
     "gatsby-source-filesystem": "^5.5.0",
     "gatsby-transformer-json": "^5.5.0",
