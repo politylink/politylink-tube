@@ -52,7 +52,7 @@ def build_remove_symbol_pattern():
 
 
 def build_moderator_pattern():
-    phrases = ['君', 'さん', '大臣', '参考人', '官', '長', '知事', '員']
+    phrases = ['君', 'さん', '大臣', '参考人', '官', '長', '知事', '員', '総裁']
     pattern = r'({0})。?$'.format('|'.join(phrases))
     return re.compile(pattern)
 

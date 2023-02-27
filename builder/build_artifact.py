@@ -18,6 +18,9 @@ def main():
 
     for clip in clips:
         artifact = builder.build(clip.id)
+        if not len(artifact.transcript):
+            LOGGER.info(f'{clip.id} does not have transcript yet.')
+            continue
         fp = path_helper.get_clip_fp(clip.id)
         with open(fp, 'w') as f:
             f.write(artifact.json(ensure_ascii=False, indent=2, by_alias=True))

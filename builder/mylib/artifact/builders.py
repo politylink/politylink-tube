@@ -69,13 +69,7 @@ class TranscriptArtifactBuilder:
 
         fp = self.path_helper.get_transcript_fp(video_id)
         if not fp.exists():
-            build_helper = TranscriptBuildHelper()
-            build_helper.add_word(Word(
-                start=start_sec,
-                end=end_sec,
-                text='（文字起こし作成中）'
-            ))
-            return build_helper.build()
+            return Transcript()
 
         df = pd.read_csv(fp)
         df['text'] = df['text'].apply(clean_text)

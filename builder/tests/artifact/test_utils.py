@@ -38,6 +38,6 @@ def test_is_moderator():
 
 def test_is_moderator_positive():
     phrases = ['君', 'さん', '大臣', '参考人', '審議官', '政務官', '局長', '次長', '部長', '知事', '議長', '調整官', '官房長官',
-               '委員', '議員']
+               '委員', '議員', '副総裁']
     for phrase in phrases:
         assert is_moderator(phrase)
