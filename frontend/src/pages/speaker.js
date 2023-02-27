@@ -2,6 +2,7 @@ import * as React from "react"
 import Container from "@mui/material/Container";
 import HomeLayout from "../layout/homeLayout";
 import {Alert} from "@mui/material";
+import SEO from "../components/seo";
 
 
 const SpeakerPage = () => {
@@ -15,3 +16,11 @@ const SpeakerPage = () => {
 };
 
 export default SpeakerPage;
+
+export const Head = ({location}) => {
+    return (
+        <SEO
+            path={location.pathname}
+        />
+    )
+}

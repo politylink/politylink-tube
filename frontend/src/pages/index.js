@@ -4,7 +4,7 @@ import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
 import VideoCard from "../components/videoCard";
 import {graphql} from 'gatsby'
-import {buildClipImageUrl, buildClipUrl} from "../utils/urlUtils";
+import {buildClipImageUrl, buildClipUrl, buildImageUrl} from "../utils/urlUtils";
 import SEO from "../components/seo";
 
 
@@ -52,8 +52,12 @@ export const query = graphql`
 
 export default IndexPage;
 
-export const Head = () => {
+export const Head = ({location}) => {
     return (
-        <SEO />
+        <SEO
+            path={location.pathname}
+            imageUrl={buildImageUrl('/summary.png')}
+            twitterCard={'summary_large_image'}
+        />
     )
 }

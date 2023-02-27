@@ -13,6 +13,7 @@ import SEO from "../../components/seo";
 import {buildClipPageDescription, buildClipPageTitle} from "../../utils/seoUtils";
 import TranscriptPanel from "../../components/transcriptPanel";
 import VideoInfoPanel from "../../components/videoInfoPanel";
+import {buildClipImageUrl} from "../../utils/urlUtils";
 
 
 const ClipPage = ({data}) => {
@@ -195,9 +196,11 @@ export const Head = ({location, data}) => {
     const clip = data.clipJson
     return (
         <SEO
+            path={location.pathname}
             title={buildClipPageTitle(clip.title)}
             description={buildClipPageDescription(clip.title, clip.video.date)}
-            path={location.pathname}
+            imageUrl={buildClipImageUrl(clip.clipId, 'l')}
+            twitterCard={'summary_large_image'}
         />
     )
 }

@@ -12,7 +12,7 @@ module.exports = {
         twitterUsername: `@politylink`,
         twitterCard: `summary`,
         siteUrl: `https://politylink.jp`,
-        imageUrl: `https://image.politylink.jp/player/summary.png`
+        imageUrl: `https://politylink.jp/logo.png`
     },
     plugins: [
         `gatsby-transformer-json`,

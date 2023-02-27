@@ -2,6 +2,7 @@ import * as React from "react"
 import HomeLayout from "../layout/homeLayout";
 import Container from "@mui/material/Container";
 import {Alert} from "@mui/material";
+import SEO from "../components/seo";
 
 
 const TopicPage = () => {
@@ -15,3 +16,11 @@ const TopicPage = () => {
 }
 
 export default TopicPage;
+
+export const Head = ({location}) => {
+    return (
+        <SEO
+            path={location.pathname}
+        />
+    )
+}
