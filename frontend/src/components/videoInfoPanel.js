@@ -27,13 +27,10 @@ const VideoInfoPanel = ({title, date, duration, pageUrl, annotations, updateTime
                         <Typography variant="body1" color="text.secondary">
                             {date}
                         </Typography>
-                        <Typography variant="body1" color="text.secondary" sx={{marginLeft: 3}}>
+                        <Typography variant="body1" color="text.secondary" sx={{marginLeft: 2}}>
                             {duration}
                         </Typography>
                     </Box>
-                </Box>
-                <Box sx={{display: 'flex', alignItems: 'center'}}>
-                    <Chip color='primary' icon={<ShareIcon/>} label={'共有'} sx={{marginX: 1}}/>
                 </Box>
             </Box>
             <Box sx={{marginTop: 2}}>
@@ -50,7 +47,8 @@ const VideoInfoPanel = ({title, date, duration, pageUrl, annotations, updateTime
                 </Typography>
                 {annotations.map(({start, time, text}, i) => (
                     <Box sx={{display: 'flex', marginY: 0, alignItems: 'start'}} key={i}>
-                        <Link component="button" variant="body2" underline="hover" onClick={() => updateTime(start)} color='primary'>
+                        <Link component="button" variant="body2" underline="hover" onClick={() => updateTime(start)}
+                              color='primary'>
                             {time}
                         </Link>
                         <Typography sx={{marginLeft: 1}} variant='body2'>

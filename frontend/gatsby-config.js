@@ -36,5 +36,24 @@ module.exports = {
                 trackingIds: [process.env.GOOGLE_ANALYTICS_TRACKING_ID],
             },
         },
+        {
+            resolve: `gatsby-plugin-manifest`,
+            options: {
+                name: `PolityLink`,
+                short_name: `PolityLink`,
+                start_url: `/`,
+                background_color: `#174a5c`,
+                theme_color: `#174a5c`,
+                icon: `static/logo.png`,
+            },
+        },
+        {
+            resolve: `gatsby-source-filesystem`,
+            options: {
+                name: `markdowns`,
+                path: `${__dirname}/src/markdowns/`,
+            },
+        },
+        `gatsby-transformer-remark`,
     ],
 }
