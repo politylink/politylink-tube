@@ -59,7 +59,6 @@ const ClipPage = ({data}) => {
             editWordNodeClass(transcriptRef.current, activeWordPosition, wordStyles.active);
             editWordNodeClass(transcriptRef.current, activeWordPositionRef.current, wordStyles.active, false);
             activeWordPositionRef.current = activeWordPosition;
-            console.log(isAutoScrollRef.current);
             if (isAutoScrollRef.current) {
                 scrollToWord(transcriptRef.current, activeWordPositionRef.current);
             }

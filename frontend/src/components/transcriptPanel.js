@@ -7,6 +7,7 @@ class TranscriptPanel extends PureComponent {
         return (
             <Box sx={{
                 paddingX: {xs: 3, sm: 3, md: 5},
+                paddingBottom: 12 // safeguard to avoid footer overlap
             }}>
                 {this.props.utterances.map(({start, end, words}, i) => (
                     <TranscriptUtterance
@@ -17,11 +18,6 @@ class TranscriptPanel extends PureComponent {
                         updateTime={this.props.updateTime}
                     />
                 ))}
-                {/* safeguard to avoid footer overlap. need to mimic TranscriptUtterance DOM structure (2 child nodes) for transcriptUtil.js */}
-                <Box sx={{height: '100px'}}>
-                    <div/>
-                    <div/>
-                </Box>
             </Box>
         );
     }
