@@ -9,7 +9,14 @@ export const getVideojsOptions = (videoUrl) => {
         sources: [{
             src: videoUrl,
             type: 'application/x-mpegURL'
-        }]
+        }],
+        html5: {
+            vhs: {
+                overrideNative: true
+            },
+            nativeAudioTracks: false,
+            nativeVideoTracks: false
+        }
     };
 }
 
