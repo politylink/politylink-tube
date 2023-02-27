@@ -8,7 +8,7 @@ require("dotenv").config({
 module.exports = {
     siteMetadata: {
         title: `PolityLink｜国会を、もっとおもしろく。`,
-        description: `PolityLink（ポリティリンク）は国会がもっと身近になる動画サイトです。国会中継を文字起こしと一緒に再生することで、いま国会でどんなことが話題なのか簡単にチェックできます。`,
+        description: `PolityLink（ポリティリンク）は、国会がもっとおもしろくなる動画サイトです。国会中継を文字起こしと一緒に再生することで、いま国会でどんなことが話題なのか簡単にチェックできます。`,
         twitterUsername: `@politylink`,
         twitterCard: `summary`,
         siteUrl: `https://politylink.jp`,
