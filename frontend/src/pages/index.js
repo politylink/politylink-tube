@@ -56,7 +56,7 @@ export const Head = ({location}) => {
     return (
         <SEO
             path={location.pathname}
-            imageUrl={buildImageUrl('/summary.png')}
+            imageUrl={buildImageUrl('/summary.png?1')}
             twitterCard={'summary_large_image'}
         />
     )

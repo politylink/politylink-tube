@@ -4,5 +4,5 @@ export const buildClipPageTitle = (title) => {
 }
 
 export const buildClipPageDescription = (title, date) => {
-    return `${title}（${date}）の国会中継をPolityLinkで見てみよう。`
+    return `${date}に開催された${title}の国会中継をPolityLinkで見てみよう。`
 }
