@@ -29,6 +29,9 @@ class PathHelper:
     def get_clip_fp(self, clip_id: int) -> Path:
         return self.root_dir / f'artifact/clip/{clip_id}.json'
 
+    def get_artifact_diff_fp(self) -> Path:
+        return self.root_dir / f'artifact/diff.txt'
+
     def get_image_dir(self):
         return self.root_dir / 'artifact/image'
 
