@@ -5,6 +5,7 @@ from pathlib import Path
 
 from mylib.sqlite.client import SqliteClient
 from mylib.sqlite.schema import Video
+from mylib.utils.path import PathHelper
 from mylib.workflow.jobs import ShugiinTvJob, SangiinTvJob, GatsbyDeployJob, GenerateClipsJob, BuildArtifactJob, \
     GenerateImagesJob
 
@@ -36,11 +37,19 @@ def main():
         GenerateClipsJob(log_fp=LOG_DIR / 'generate_clips.log'),
         GenerateImagesJob(log_fp=LOG_DIR / 'generate_images.log'),
         BuildArtifactJob(log_fp=LOG_DIR / 'build_artifact.log'),
-        GatsbyDeployJob(log_fp=LOG_DIR / 'gatsby.log')
     ]
     for job in jobs:
         LOGGER.info(f'run {job}')
         job.run()
+
+    diff_fp = PathHelper().get_artifact_diff_fp()
+    if diff_fp.stat().st_size == 0:
+        LOGGER.info('skip deployment as artifact is fresh.')
+        return
+
+    job = GatsbyDeployJob(log_fp=LOG_DIR / 'gatsby.log')
+    LOGGER.info(f'run {job}')
+    job.run()
 
 
 if __name__ == '__main__':

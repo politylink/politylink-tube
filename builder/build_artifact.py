@@ -16,15 +16,33 @@ def main():
     clips = sqlite_client.select_all(Clip, type=ClipType.FULL)
     builder = ClipArtifactBuilder(sqlite_client, path_helper)
 
+    updated_fps = []
     for clip in clips:
         artifact = builder.build(clip.id)
+
         if not len(artifact.transcript):
             LOGGER.info(f'{clip.id} does not have transcript yet.')
             continue
+
         fp = path_helper.get_clip_fp(clip.id)
+        if fp.exists():
+            artifact_prev = open(fp, 'r').read()
+            artifact_new = artifact.json(ensure_ascii=False, indent=2, by_alias=True)
+            if artifact_prev == artifact_new:
+                LOGGER.info(f'{fp} is fresh.')
+                continue
+
         with open(fp, 'w') as f:
             f.write(artifact.json(ensure_ascii=False, indent=2, by_alias=True))
         LOGGER.info(f'saved {fp}')
+        updated_fps.append(fp)
+    LOGGER.info(f'updated total {len(updated_fps)} files.')
+
+    diff_fp = path_helper.get_artifact_diff_fp()
+    with open(diff_fp, 'w') as f:
+        for fp in updated_fps:
+            f.write(f'{fp}\n')
+    LOGGER.info(f'saved diff in {diff_fp}')
 
 
 if __name__ == '__main__':
