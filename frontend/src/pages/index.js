@@ -35,7 +35,7 @@ const IndexPage = ({data}) => {
 
 export const query = graphql`
   query {
-    allClipJson (sort: {video: {date: DESC}}) {
+    allClipJson (sort: [{video: {date: DESC}}, {clipId: DESC}]) {
       nodes {
         clipId
         title
