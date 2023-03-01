@@ -79,7 +79,7 @@ class WhisperJob(BashOperator):
         bin_fp = whisper_dir / 'main'
         model_fp = whisper_dir / f'models/ggml-{model}.bin'
         result_fp = self.get_result_fp(wav_fp)
-        prompt = "静粛に。これより、会議を開きます。"  # prompt to include punctuation marks
+        prompt = "静粛に。第211回国会は本日、招集されました。これより、会議を開きます。"  # prompt to include punctuation marks
         bash_command = f'{bin_fp} --model {model_fp} --language ja --file {wav_fp} --output-csv　--prompt {prompt}'
 
         context.in_fps = [wav_fp]
