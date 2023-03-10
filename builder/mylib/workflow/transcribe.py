@@ -47,7 +47,7 @@ class TranscribeJobScheduler(JobScheduler):
 
         jobs = [
             InitDirJob(work_dir),
-            AudioDownloadJob(request.m3u8_url, mp3_fp),
+            AudioDownloadJob(m3u8_url=request.m3u8_url, audio_fp=mp3_fp, log_fp=log_dir / 'download.log'),
         ]
         if request.download_only:
             return self.return_jobs(jobs)

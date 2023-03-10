@@ -31,12 +31,13 @@ class InitDirJob(PythonOperator):
 
 
 class AudioDownloadJob(BashOperator):
-    def __init__(self, m3u8_url: str, audio_fp: Path):
+    def __init__(self, m3u8_url: str, audio_fp: Path, log_fp: Path):
         context = self.init_context(locals())
 
         bash_command = f'ffmpeg -i {m3u8_url} {audio_fp}'
 
         context.out_fps = [audio_fp]
+        context.log_fp = log_fp
         super().__init__(bash_command, context=context)
 
 
