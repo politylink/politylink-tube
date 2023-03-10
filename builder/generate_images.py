@@ -13,33 +13,37 @@ from mylib.utils.path import PathHelper
 LOGGER = getLogger(__name__)
 
 
-def build_requests(video_id, sqlite_client: SqliteClient, path_helper: PathHelper):
+def build_requests(sqlite_client: SqliteClient, path_helper: PathHelper, overwrite=False):
     requests = []
 
+    videos = sqlite_client.select_all(VideoDb)
+    m3u8_url_map = dict([(video.id, video.m3u8_url) for video in videos])
+
     if args.clip:
-        full_clip = sqlite_client.select_first(ClipDb, type=ClipType.FULL, video_id=video_id)
-        for size in [ImageSize.MEDIUM, ImageSize.LARGE]:
-            requests.append(ImageGenerateRequest(
-                time_sec=full_clip.start_sec + 30,
-                size=size,
-                local_fp=path_helper.get_local_clip_image_fp(full_clip.id, size)
-            ))
+        clips = sqlite_client.select_all(ClipDb, type=ClipType.FULL)
+        for clip in clips:
+            for size in [ImageSize.MEDIUM, ImageSize.LARGE]:
+                requests.append(ImageGenerateRequest(
+                    m3u8_url=m3u8_url_map[clip.video_id],
+                    time_sec=clip.start_sec + 30,
+                    size=size,
+                    local_fp=path_helper.get_local_clip_image_fp(clip.id, size),
+                    overwrite=overwrite
+                ))
 
     if args.annotation:
-        annotations = sqlite_client.select_all(AnnotationDb, video_id=video_id)
+        annotations = sqlite_client.select_all(AnnotationDb)
         for annotation in annotations:
             for size in [ImageSize.MEDIUM, ImageSize.LARGE]:
                 requests.append(ImageGenerateRequest(
+                    m3u8_url=m3u8_url_map[annotation.video_id],
                     time_sec=annotation.start_sec + 30,
                     size=size,
-                    local_fp=path_helper.get_local_annotation_image_fp(annotation.id, size)
+                    local_fp=path_helper.get_local_annotation_image_fp(annotation.id, size),
+                    overwrite=overwrite
                 ))
 
-    for request in requests:
-        if args.overwrite:
-            request.overwrite = True
-        if args.publish:
-            request.s3_fp = path_helper.to_s3_image_fp(request.local_fp)
+    requests = list(sorted(requests, key=lambda x: x.m3u8_url))  # group by url to improve ImageGenerator perf
 
     return requests
 
@@ -48,16 +52,15 @@ def main():
     sqlite_client = SqliteClient(host=args.host)
     path_helper = PathHelper(host=args.host)
     s3_client = boto3.client('s3')
+    generator = ImageGenerator(s3_client=s3_client)
 
-    videos = sqlite_client.select_all(VideoDb)
-    LOGGER.info(f'found {len(videos)} videos')
+    requests = build_requests(sqlite_client, path_helper, overwrite=args.overwrite)
+    LOGGER.info(f'found {len(requests)} requests')
 
-    for video in videos:
-        requests = build_requests(video.id, sqlite_client, path_helper)
-        LOGGER.info(f'built {len(requests)} requests for {video.m3u8_url}')
-        generator = ImageGenerator(m3u8_url=video.m3u8_url, s3_client=s3_client)
-        for request in requests:
-            generator.generate(request)
+    for request in requests:
+        generator.generate(request)
+        if args.publish:
+            generator.publish(local_fp=request.local_fp, s3_fp=path_helper.to_s3_image_fp(request.local_fp))
 
 
 if __name__ == '__main__':
