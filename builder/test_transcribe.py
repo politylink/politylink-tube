@@ -25,9 +25,9 @@ def main():
         result_fps.append(result_fp)
 
         AudioSplitJob(audio_fp=audio_fp, start_sec=row['start_sec'], end_sec=row['end_sec'], out_fp=wav_fp).run()
-        WhisperJob(wav_fp=wav_fp, log_fp=log_fp)
+        WhisperJob(wav_fp=wav_fp, log_fp=log_fp).run()
 
-    MergeWhisperJob(vad_fp=vad_fp, result_fps=result_fps, out_fp=transcript_fp)
+    MergeWhisperJob(vad_fp=vad_fp, result_fps=result_fps, out_fp=transcript_fp).run()
 
 
 if __name__ == '__main__':

@@ -16,7 +16,7 @@ LOG_DATE_FORMAT = "%Y-%m-%d %I:%M:%S"
 LOG_FORMAT = '%(asctime)s [%(name)s] %(levelname)s: %(message)s'
 
 
-def build_requests() -> List[TranscribeRequest]:
+def build_requests(download_only=False) -> List[TranscribeRequest]:
     requests = []
     client = SqliteClient()
     videos = client.select_all(Video)
@@ -25,7 +25,7 @@ def build_requests() -> List[TranscribeRequest]:
             video_id=video.id,
             datetime=video.datetime,
             m3u8_url=video.m3u8_url,
-            download_only=args.download
+            download_only=download_only
         ))
     return requests
 
@@ -35,7 +35,7 @@ def main():
     scheduler = TranscribeJobScheduler(path_helper=path_helper, force_execute=args.force)
     is_sleeping = False
     while True:
-        requests = build_requests()
+        requests = build_requests(download_only=args.download)
         jobs = scheduler.schedule_batch(requests)
         if not jobs:
             if not is_sleeping:
