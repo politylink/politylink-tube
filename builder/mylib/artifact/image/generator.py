@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from enum import IntEnum
 from logging import getLogger
 from pathlib import Path
 
@@ -25,6 +26,12 @@ class ImageGenerateRequest:
     overwrite: bool = False
 
 
+class ImageGenerateResponse(IntEnum):
+    UNKNOWN = 0
+    SUCCESS = 1
+    SKIP = 2
+
+
 class ImageGenerator:
     def __init__(self, s3_client=None):
         self.s3_client = s3_client
@@ -38,10 +45,10 @@ class ImageGenerator:
         self.m3u8_url = m3u8_url
         self.cap = cv2.VideoCapture(m3u8_url)
 
-    def generate(self, request: ImageGenerateRequest):
+    def generate(self, request: ImageGenerateRequest) -> ImageGenerateResponse:
         if request.local_fp and request.local_fp.exists() and not request.overwrite:
             LOGGER.info(f'{request.local_fp} already exists')
-            return
+            return ImageGenerateResponse.SKIP
 
         self._load(request.m3u8_url)
         frame_number = int(self.cap.get(cv2.CAP_PROP_FPS) * request.time_sec)
@@ -56,6 +63,7 @@ class ImageGenerator:
         request.local_fp.parent.mkdir(exist_ok=True, parents=True)
         cv2.imwrite(str(request.local_fp), image)
         LOGGER.info(f'saved {request.local_fp}')
+        return ImageGenerateResponse.SUCCESS
 
     def publish(self, local_fp: Path, s3_fp: Path):
         if not self.s3_client:

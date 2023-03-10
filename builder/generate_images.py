@@ -4,7 +4,7 @@ from logging import getLogger
 
 import boto3
 
-from mylib.artifact.image.generator import ImageGenerator, ImageGenerateRequest
+from mylib.artifact.image.generator import ImageGenerator, ImageGenerateRequest, ImageGenerateResponse
 from mylib.sqlite.client import SqliteClient
 from mylib.sqlite.schema import Video as VideoDb, Clip as ClipDb, Annotation as AnnotationDb, ClipType
 from mylib.utils.constants import ImageSize
@@ -58,8 +58,8 @@ def main():
     LOGGER.info(f'found {len(requests)} requests')
 
     for request in requests:
-        generator.generate(request)
-        if args.publish:
+        response = generator.generate(request)
+        if args.publish and response == ImageGenerateResponse.SUCCESS:
             generator.publish(local_fp=request.local_fp, s3_fp=path_helper.to_s3_image_fp(request.local_fp))
 
 
