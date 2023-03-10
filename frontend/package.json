@@ -24,6 +24,7 @@
     "gatsby-plugin-google-gtag": "^5.7.0",
     "gatsby-plugin-manifest": "^5.7.0",
     "gatsby-plugin-s3": "^0.3.8",
+    "gatsby-plugin-sitemap": "^6.7.0",
     "gatsby-source-filesystem": "^5.7.0",
     "gatsby-transformer-json": "^5.5.0",
     "gatsby-transformer-remark": "^6.7.0",
