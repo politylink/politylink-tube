@@ -1,6 +1,6 @@
 
-export const buildClipPageTitle = (title) => {
-    return `${title}｜PolityLink`
+export const buildClipPageTitle = (title, date) => {
+    return `${title} ${date}｜PolityLink`
 }
 
 export const buildClipPageDescription = (title, date) => {

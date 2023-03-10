@@ -197,7 +197,7 @@ export const Head = ({location, data}) => {
     return (
         <SEO
             path={location.pathname}
-            title={buildClipPageTitle(clip.title)}
+            title={buildClipPageTitle(clip.title, clip.video.date)}
             description={buildClipPageDescription(clip.title, clip.video.date)}
             imageUrl={buildClipImageUrl(clip.clipId, 'l')}
             twitterCard={'summary_large_image'}
