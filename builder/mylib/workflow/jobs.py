@@ -4,6 +4,7 @@ from logging import getLogger
 from pathlib import Path
 from typing import List
 
+import numpy as np
 import pandas as pd
 
 from mylib.audio.models import AudioModel
@@ -86,7 +87,6 @@ class WhisperJob(BashOperator):
         context.in_fps = [wav_fp]
         context.out_fps = [result_fp]
         context.log_fp = log_fp
-        context.priority = -100  # de-prioritize to download & split all audio first
         super().__init__(bash_command, context=context)
 
     @staticmethod
@@ -142,10 +142,11 @@ class ApplyPatchJob(PythonOperator):
             patch_df = pd.read_csv(patch_fp)
             transcript_patch_df = pd.read_csv(transcript_patch_fp)
 
-            transcript_masked_df = transcript_df
+            mask = np.zeros(len(transcript_df)).astype(bool)
             for start_sec, end_sec in zip(patch_df['start_sec'], patch_df['end_sec']):
-                mask = (transcript_df['start_ms'] >= start_sec * 1000) & (transcript_df['end_ms'] <= end_sec * 1000)
-                transcript_masked_df = transcript_df[~mask]
+                mask = mask | ((transcript_df['start_ms'] >= start_sec * 1000) & (
+                            transcript_df['end_ms'] <= end_sec * 1000)).values
+            transcript_masked_df = transcript_df[~mask]
 
             out_df = pd.concat([transcript_masked_df, transcript_patch_df])
             out_df = out_df.sort_values(by='start_ms')
