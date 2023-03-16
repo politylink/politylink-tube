@@ -5,3 +5,4 @@ public
 tsconfig.json
 .eslintrc.js
 *.d.ts
+*.md
