@@ -28,34 +28,22 @@ class ClipArtifactBuilder:
             start=clip_db.start_sec,
             end=clip_db.end_sec,
             date=format_date(video_db.datetime),
-            duration=format_duration(clip_db.end_sec - clip_db.start_sec)
+            duration=format_duration(clip_db.end_sec - clip_db.start_sec),
         )
         transcript = self.transcript_builder.build(
-            video_id=clip_db.video_id,
-            start_sec=clip_db.start_sec,
-            end_sec=clip_db.end_sec
+            video_id=clip_db.video_id, start_sec=clip_db.start_sec, end_sec=clip_db.end_sec
         )
         annotations = [convert_annotation(annotation_db) for annotation_db in annotation_dbs]
 
-        return Clip(
-            clip_id=clip_id,
-            title=clip_db.title,
-            video=video,
-            transcript=transcript,
-            annotations=annotations
-        )
+        return Clip(clip_id=clip_id, title=clip_db.title, video=video, transcript=transcript, annotations=annotations)
 
 
 def convert_annotation(annotation_db: AnnotationDb) -> Annotation:
     text = annotation_db.speaker_name
     if annotation_db.speaker_info:
-        text += f'（{annotation_db.speaker_info}）'
+        text += f"（{annotation_db.speaker_info}）"
 
-    return Annotation(
-        start=annotation_db.start_sec,
-        time=format_time(annotation_db.start_sec),
-        text=text
-    )
+    return Annotation(start=annotation_db.start_sec, time=format_time(annotation_db.start_sec), text=text)
 
 
 class TranscriptArtifactBuilder:
@@ -72,29 +60,25 @@ class TranscriptArtifactBuilder:
             return Transcript()
 
         df = pd.read_csv(fp)
-        df['text'] = df['text'].apply(clean_text)
-        df = df[df['text'] != '']
-        df['diff_ms'] = calc_diff_time(df['start_ms'].values, df['end_ms'].values)
-        df['has_gap'] = df['diff_ms'] > 0
-        df['is_moderator'] = df['text'].apply(is_moderator)
+        df["text"] = df["text"].apply(clean_text)
+        df = df[df["text"] != ""]
+        df["diff_ms"] = calc_diff_time(df["start_ms"].values, df["end_ms"].values)
+        df["has_gap"] = df["diff_ms"] > 0
+        df["is_moderator"] = df["text"].apply(is_moderator)
 
         if start_sec:
-            df = df[df['end_ms'] > start_sec * 1000]
+            df = df[df["end_ms"] > start_sec * 1000]
         if end_sec:
-            df = df[df['start_ms'] < end_sec * 1000]
+            df = df[df["start_ms"] < end_sec * 1000]
 
         build_helper = TranscriptBuildHelper()
         for _, row in df.iterrows():
-            word = Word(
-                start=row['start_ms'] / 1000,
-                end=row['end_ms'] / 1000,
-                text=row['text']
-            )
-            if row['is_moderator']:
+            word = Word(start=row["start_ms"] / 1000, end=row["end_ms"] / 1000, text=row["text"])
+            if row["is_moderator"]:
                 build_helper.finish_utterance()  # not always correct when the moderator has multiple utterances
                 build_helper.add_word(word)
                 build_helper.finish_utterance()
-            elif row['has_gap']:
+            elif row["has_gap"]:
                 build_helper.finish_utterance()
                 build_helper.add_word(word)
             else:

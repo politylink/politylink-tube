@@ -32,6 +32,7 @@
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
+    "prettier": "^2.8.4",
     "video.js": "^8.0.4"
   }
 }

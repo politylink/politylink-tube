@@ -1,12 +1,12 @@
 import re
 from datetime import datetime
 
-DAY_OF_WEEK_LABEL = '月火水木金土日'
+DAY_OF_WEEK_LABEL = "月火水木金土日"
 
 
 def format_date(dt: datetime):
     dow = DAY_OF_WEEK_LABEL[dt.weekday()]
-    return dt.strftime('%Y年%m月%d日') + f'({dow})'
+    return dt.strftime("%Y年%m月%d日") + f"({dow})"
 
 
 def format_duration(sec: float):
@@ -14,7 +14,7 @@ def format_duration(sec: float):
     hour = sec // 3600
     sec -= hour * 3600
     minute = sec // 60
-    return f'{hour}h{minute}m'
+    return f"{hour}h{minute}m"
 
 
 def format_time(sec: float):
@@ -24,36 +24,33 @@ def format_time(sec: float):
     minute = sec // 60
     sec -= minute * 60
     if hour:
-        return f'{hour}:{minute:02}:{sec:02}'
+        return f"{hour}:{minute:02}:{sec:02}"
     else:
-        return f'{minute}:{sec:02}'
+        return f"{minute}:{sec:02}"
 
 
 def format_place(house: str, meeting: str):
-    return f'{house} {meeting}'
+    return f"{house} {meeting}"
 
 
-SYMBOL_LEFT = '（(\[【'
-SYMBOL_RIGHT = '\])）】'
+SYMBOL_LEFT = "（(\[【"
+SYMBOL_RIGHT = "\])）】"
 
 
 def build_mask_phrase_pattern():
-    phrases = [
-        '拍手', '記者', '笑', '委員長', '字幕視聴ありがとうございました', '御静聴', '音声なし', '間', '司会', '質疑応答',
-        '小声', '質問', '会議の音声', '会議の音'
-    ]
-    pattern = r'[{0}]+\s*({1})\s*[{2}]+'.format(SYMBOL_LEFT, '|'.join(phrases), SYMBOL_RIGHT)
+    phrases = ["拍手", "記者", "笑", "委員長", "字幕視聴ありがとうございました", "御静聴", "音声なし", "間", "司会", "質疑応答", "小声", "質問", "会議の音声", "会議の音"]
+    pattern = r"[{0}]+\s*({1})\s*[{2}]+".format(SYMBOL_LEFT, "|".join(phrases), SYMBOL_RIGHT)
     return re.compile(pattern)
 
 
 def build_remove_symbol_pattern():
-    pattern = r'[{0}{1}]+'.format(SYMBOL_LEFT, SYMBOL_RIGHT)
+    pattern = r"[{0}{1}]+".format(SYMBOL_LEFT, SYMBOL_RIGHT)
     return re.compile(pattern)
 
 
 def build_moderator_pattern():
-    phrases = ['君', 'さん', '大臣', '参考人', '官', '長', '知事', '員', '総裁']
-    pattern = r'({0})。?$'.format('|'.join(phrases))
+    phrases = ["君", "さん", "大臣", "参考人", "官", "長", "知事", "員", "総裁"]
+    pattern = r"({0})。?$".format("|".join(phrases))
     return re.compile(pattern)
 
 
@@ -63,11 +60,11 @@ MODERATOR_PATTERN = build_moderator_pattern()
 
 
 def mask_phrase(text):
-    return re.sub(MASK_PHRASE_PATTERN, '', text).strip()
+    return re.sub(MASK_PHRASE_PATTERN, "", text).strip()
 
 
 def remove_symbol(text):
-    return re.sub(REMOVE_SYMBOL_PATTERN, '', text).strip()
+    return re.sub(REMOVE_SYMBOL_PATTERN, "", text).strip()
 
 
 def clean_text(text):

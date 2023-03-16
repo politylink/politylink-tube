@@ -21,34 +21,34 @@ def main():
         artifact = builder.build(clip.id)
 
         if not len(artifact.transcript):
-            LOGGER.info(f'{clip.id} does not have transcript yet.')
+            LOGGER.info(f"{clip.id} does not have transcript yet.")
             continue
 
         fp = path_helper.get_clip_fp(clip.id)
         if fp.exists():
-            artifact_prev = open(fp, 'r').read()
+            artifact_prev = open(fp, "r").read()
             artifact_new = artifact.json(ensure_ascii=False, indent=2, by_alias=True)
             if artifact_prev == artifact_new:
-                LOGGER.info(f'{fp} is fresh.')
+                LOGGER.info(f"{fp} is fresh.")
                 continue
 
-        with open(fp, 'w') as f:
+        with open(fp, "w") as f:
             f.write(artifact.json(ensure_ascii=False, indent=2, by_alias=True))
-        LOGGER.info(f'saved {fp}')
+        LOGGER.info(f"saved {fp}")
         updated_fps.append(fp)
-    LOGGER.info(f'updated total {len(updated_fps)} files.')
+    LOGGER.info(f"updated total {len(updated_fps)} files.")
 
     diff_fp = path_helper.get_artifact_diff_fp()
-    with open(diff_fp, 'w') as f:
+    with open(diff_fp, "w") as f:
         for fp in updated_fps:
-            f.write(f'{fp}\n')
-    LOGGER.info(f'saved diff in {diff_fp}')
+            f.write(f"{fp}\n")
+    LOGGER.info(f"saved diff in {diff_fp}")
 
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='')
-    parser.add_argument('-v', '--verbose', action='store_true')
-    parser.add_argument('--host', default='')
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="")
+    parser.add_argument("-v", "--verbose", action="store_true")
+    parser.add_argument("--host", default="")
     args = parser.parse_args()
 
     logging.basicConfig(level=logging.DEBUG if args.verbose else logging.INFO)

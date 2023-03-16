@@ -18,11 +18,11 @@ class Serializable:
         return d
 
     def __repr__(self):
-        return f'<{self.__class__.__name__} {self.serialize()}>'
+        return f"<{self.__class__.__name__} {self.serialize()}>"
 
 
 class Video(Base, Serializable):
-    __tablename__ = 'video'
+    __tablename__ = "video"
     id = Column(Integer, primary_key=True)
     m3u8_url = Column(String, index=True)  # order matters when importing CSV with db/init.sql
     page_url = Column(String)
@@ -32,7 +32,7 @@ class Video(Base, Serializable):
 
 
 class Annotation(Base, Serializable):
-    __tablename__ = 'annotation'
+    __tablename__ = "annotation"
     id = Column(Integer, primary_key=True)
     video_id = Column(Integer, index=True)
     start_sec = Column(Float)
@@ -50,7 +50,7 @@ class ClipType:
 
 
 class Clip(Base, Serializable):
-    __tablename__ = 'clip'
+    __tablename__ = "clip"
     id = Column(Integer, primary_key=True)
     key = Column(String, unique=True)
     video_id = Column(Integer, index=True)
@@ -60,5 +60,9 @@ class Clip(Base, Serializable):
     type = Column(Integer)
 
 
-Index('ix_annotation_videoId_startSec_producer',
-      Annotation.__table__.c.video_id, Annotation.__table__.c.start_sec, Annotation.__table__.c.producer)
+Index(
+    "ix_annotation_videoId_startSec_producer",
+    Annotation.__table__.c.video_id,
+    Annotation.__table__.c.start_sec,
+    Annotation.__table__.c.producer,
+)

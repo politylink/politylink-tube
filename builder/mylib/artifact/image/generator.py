@@ -9,18 +9,14 @@ from mylib.utils.constants import ImageSize
 
 LOGGER = getLogger(__name__)
 
-IMAGE_DSIZE_MAP = {
-    ImageSize.SMALL: (160, 90),
-    ImageSize.MEDIUM: (320, 180),
-    ImageSize.LARGE: (640, 360)
-}
+IMAGE_DSIZE_MAP = {ImageSize.SMALL: (160, 90), ImageSize.MEDIUM: (320, 180), ImageSize.LARGE: (640, 360)}
 
 
 @dataclass
 class ImageGenerateRequest:
-    m3u8_url: str = ''
-    time_sec: float = 0.
-    local_fp: Path = ''
+    m3u8_url: str = ""
+    time_sec: float = 0.0
+    local_fp: Path = ""
     size: ImageSize = ImageSize.UNKNOWN
     dsize: tuple = None  # (width, height)
     overwrite: bool = False
@@ -41,13 +37,13 @@ class ImageGenerator:
     def _load(self, m3u8_url: str):
         if self.m3u8_url == m3u8_url:
             return
-        LOGGER.debug(f'load {m3u8_url}')
+        LOGGER.debug(f"load {m3u8_url}")
         self.m3u8_url = m3u8_url
         self.cap = cv2.VideoCapture(m3u8_url)
 
     def generate(self, request: ImageGenerateRequest) -> ImageGenerateResponse:
         if request.local_fp and request.local_fp.exists() and not request.overwrite:
-            LOGGER.info(f'{request.local_fp} already exists')
+            LOGGER.info(f"{request.local_fp} already exists")
             return ImageGenerateResponse.SKIP
 
         self._load(request.m3u8_url)
@@ -62,19 +58,14 @@ class ImageGenerator:
 
         request.local_fp.parent.mkdir(exist_ok=True, parents=True)
         cv2.imwrite(str(request.local_fp), image)
-        LOGGER.info(f'saved {request.local_fp}')
+        LOGGER.info(f"saved {request.local_fp}")
         return ImageGenerateResponse.SUCCESS
 
     def publish(self, local_fp: Path, s3_fp: Path):
         if not self.s3_client:
-            raise ValueError(f'you need s3 client to upload to {s3_fp}')
+            raise ValueError(f"you need s3 client to upload to {s3_fp}")
         if not local_fp.exists():
-            raise ValueError(f'you need to generate {local_fp} first to upload to {s3_fp}')
+            raise ValueError(f"you need to generate {local_fp} first to upload to {s3_fp}")
 
-        self.s3_client.upload_file(
-            str(local_fp),
-            'politylink',
-            str(s3_fp),
-            ExtraArgs={'ContentType': 'image/jpeg'}
-        )
-        LOGGER.info(f'uploaded {local_fp} to {s3_fp}')
+        self.s3_client.upload_file(str(local_fp), "politylink", str(s3_fp), ExtraArgs={"ContentType": "image/jpeg"})
+        LOGGER.info(f"uploaded {local_fp} to {s3_fp}")
