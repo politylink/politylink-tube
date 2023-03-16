@@ -26,7 +26,8 @@ poetry env use 3.10
 poetry install
 poetry shell
 ```
-`install`コマンドで必要なパッケージが入った仮想環境が構築され、`poetry shell`もしくは`poetry run ${command}`で仮想環境内でコードを実行できます。  
+`install`コマンドで必要なパッケージが入った仮想環境が構築され、`poetry shell`もしくは`poetry run ${command}`で仮想環境内でコードを実行できます。
+必要に応じて`poetry install --without dev`などを指定してください。
 
 
 ## ツール
