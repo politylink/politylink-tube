@@ -13,18 +13,18 @@ def main():
     sqlite_client = SqliteClient()
     generator = ClipGenerator(sqlite_client)
     videos = sqlite_client.select_all(Video)
-    LOGGER.info(f'found {len(videos)} videos to process')
+    LOGGER.info(f"found {len(videos)} videos to process")
 
     for video in videos:
         clips = generator.generate(video.id)
-        LOGGER.info(f'generated {len(clips)} clips for {video.id}')
+        LOGGER.info(f"generated {len(clips)} clips for {video.id}")
         for clip in clips:
-            sqlite_client.upsert(clip, keys=['key'])
+            sqlite_client.upsert(clip, keys=["key"])
 
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='')
-    parser.add_argument('-v', '--verbose', action='store_true')
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="")
+    parser.add_argument("-v", "--verbose", action="store_true")
     args = parser.parse_args()
 
     logging.basicConfig(level=logging.DEBUG if args.verbose else logging.INFO)

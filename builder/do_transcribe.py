@@ -13,7 +13,7 @@ from mylib.workflow.transcribe import TranscribeRequest, TranscribeJobScheduler
 LOGGER = logging.getLogger(__name__)
 
 LOG_DATE_FORMAT = "%Y-%m-%d %I:%M:%S"
-LOG_FORMAT = '%(asctime)s [%(name)s] %(levelname)s: %(message)s'
+LOG_FORMAT = "%(asctime)s [%(name)s] %(levelname)s: %(message)s"
 
 
 def build_requests(download_only=False) -> List[TranscribeRequest]:
@@ -21,12 +21,11 @@ def build_requests(download_only=False) -> List[TranscribeRequest]:
     client = SqliteClient()
     videos = client.select_all(Video)
     for video in videos:
-        requests.append(TranscribeRequest(
-            video_id=video.id,
-            datetime=video.datetime,
-            m3u8_url=video.m3u8_url,
-            download_only=download_only
-        ))
+        requests.append(
+            TranscribeRequest(
+                video_id=video.id, datetime=video.datetime, m3u8_url=video.m3u8_url, download_only=download_only
+            )
+        )
     return requests
 
 
@@ -39,30 +38,31 @@ def main():
         jobs = scheduler.schedule_batch(requests)
         if not jobs:
             if not is_sleeping:
-                LOGGER.info('found 0 jobs. start sleeping')
+                LOGGER.info("found 0 jobs. start sleeping")
                 is_sleeping = True
             time.sleep(300)
             continue
 
         is_sleeping = False
-        LOGGER.info(f'found {len(jobs)} jobs')
+        LOGGER.info(f"found {len(jobs)} jobs")
         job = jobs[0]
-        LOGGER.info(f'run {job}')
+        LOGGER.info(f"run {job}")
         status_code = job.run(force_execute=args.force)
 
         if status_code != StatusCode.SUCCESS:
-            LOGGER.error(f'failed to execute {job}')
+            LOGGER.error(f"failed to execute {job}")
         scheduler.record(job, status_code)
 
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='')
-    parser.add_argument('-v', '--verbose', action='store_true')
-    parser.add_argument('-f', '--force', action='store_true')
-    parser.add_argument('--host')
-    parser.add_argument('--download', action='store_true')
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="")
+    parser.add_argument("-v", "--verbose", action="store_true")
+    parser.add_argument("-f", "--force", action="store_true")
+    parser.add_argument("--host")
+    parser.add_argument("--download", action="store_true")
     args = parser.parse_args()
 
-    logging.basicConfig(level=logging.DEBUG if args.verbose else logging.INFO,
-                        datefmt=LOG_DATE_FORMAT, format=LOG_FORMAT)
+    logging.basicConfig(
+        level=logging.DEBUG if args.verbose else logging.INFO, datefmt=LOG_DATE_FORMAT, format=LOG_FORMAT
+    )
     main()

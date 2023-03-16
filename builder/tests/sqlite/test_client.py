@@ -8,33 +8,32 @@ from mylib.sqlite.schema import Video
 
 
 class TestSqliteClient:
-
     @pytest.fixture
     def client(self):
-        Path('./test.db').unlink(missing_ok=True)
-        yield SqliteClient('sqlite:///test.db')
-        Path('./test.db').unlink(missing_ok=True)
+        Path("./test.db").unlink(missing_ok=True)
+        yield SqliteClient("sqlite:///test.db")
+        Path("./test.db").unlink(missing_ok=True)
 
     def test_insert(self, client):
-        client.insert(Video(url='1'))
+        client.insert(Video(url="1"))
         assert len(client.select_all(Video)) == 1
-        client.insert(Video(url='2'))
+        client.insert(Video(url="2"))
         assert len(client.select_all(Video)) == 2
-        client.insert(Video(url='1'))
+        client.insert(Video(url="1"))
         assert len(client.select_all(Video)) == 3
-        assert len(client.select_all(Video, url='1')) == 2
+        assert len(client.select_all(Video, url="1")) == 2
 
     def test_upsert(self, client):
         dt = datetime(2023, 1, 1, 12, 0, 0)
-        client.upsert(Video(id=1, url='1'), keys=['url'])
+        client.upsert(Video(id=1, url="1"), keys=["url"])
         assert len(client.select_all(Video)) == 1
-        client.upsert(Video(id=2, url='1', datetime=dt), keys=['url'])
+        client.upsert(Video(id=2, url="1", datetime=dt), keys=["url"])
         assert len(client.select_all(Video)) == 1
 
-        db_instance = client.select_first(Video, url='1')
+        db_instance = client.select_first(Video, url="1")
         assert db_instance.id == 1
         assert db_instance.datetime == dt
 
     def test_upsert_fail_with_empty_keys(self, client):
         with pytest.raises(ValueError):
-            client.upsert(Video(id=1, url='1'), keys=[])
+            client.upsert(Video(id=1, url="1"), keys=[])

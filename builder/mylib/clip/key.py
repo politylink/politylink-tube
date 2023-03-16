@@ -14,7 +14,7 @@ class ClipKey:
     annotation_ids: List[int] = field(2, default_factory=list)
 
     def serialize(self) -> str:
-        return base64.b64encode(self.dumps()).decode('utf-8')
+        return base64.b64encode(self.dumps()).decode("utf-8")
 
     @staticmethod
     def deserialize(s: str) -> ClipKey:

@@ -39,15 +39,15 @@ class TranscribeJobScheduler(JobScheduler):
 
     def schedule(self, request: TranscribeRequest) -> List[BaseOperator]:
         work_dir = Path(self.path_helper.get_work_dir(video_id=request.video_id))
-        data_dir = work_dir / 'data'
-        log_dir = work_dir / 'log'
-        mp3_fp = data_dir / 'audio.mp3'
-        vad_fp = data_dir / 'vad.csv'
-        transcript_fp = data_dir / 'transcript.csv'
+        data_dir = work_dir / "data"
+        log_dir = work_dir / "log"
+        mp3_fp = data_dir / "audio.mp3"
+        vad_fp = data_dir / "vad.csv"
+        transcript_fp = data_dir / "transcript.csv"
 
         jobs = [
             InitDirJob(work_dir),
-            AudioDownloadJob(m3u8_url=request.m3u8_url, audio_fp=mp3_fp, log_fp=log_dir / 'download.log'),
+            AudioDownloadJob(m3u8_url=request.m3u8_url, audio_fp=mp3_fp, log_fp=log_dir / "download.log"),
         ]
         if request.download_only:
             return self.return_jobs(jobs)
@@ -59,8 +59,8 @@ class TranscribeJobScheduler(JobScheduler):
         result_fps = []
         vad_df = pd.read_csv(vad_fp)
         for _, row in vad_df.iterrows():
-            wav_fp = data_dir / '{}.wav'.format(row['id'])
-            log_fp = log_dir / 'whisper_{}.log'.format(row['id'])
+            wav_fp = data_dir / "{}.wav".format(row["id"])
+            log_fp = log_dir / "whisper_{}.log".format(row["id"])
             result_fp = WhisperJob.get_result_fp(wav_fp)
             result_fps.append(result_fp)
 
@@ -68,8 +68,8 @@ class TranscribeJobScheduler(JobScheduler):
                 # avoid generating .wav files after cleanup.
                 # Maybe we can define a single merged job to avoid such adhoc logic?
                 jobs += [
-                    AudioSplitJob(audio_fp=mp3_fp, start_sec=row['start_sec'], end_sec=row['end_sec'], out_fp=wav_fp),
-                    WhisperJob(wav_fp=wav_fp, log_fp=log_fp)
+                    AudioSplitJob(audio_fp=mp3_fp, start_sec=row["start_sec"], end_sec=row["end_sec"], out_fp=wav_fp),
+                    WhisperJob(wav_fp=wav_fp, log_fp=log_fp),
                 ]
 
         # summarize
@@ -77,8 +77,5 @@ class TranscribeJobScheduler(JobScheduler):
         if not transcript_fp.exists():
             return self.return_jobs(jobs)
 
-        jobs += self.patch_job_scheduler.schedule(PatchRequest(
-            video_id=request.video_id,
-            datetime=request.datetime
-        ))
+        jobs += self.patch_job_scheduler.schedule(PatchRequest(video_id=request.video_id, datetime=request.datetime))
         return self.return_jobs(jobs)

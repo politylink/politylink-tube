@@ -17,7 +17,7 @@ class StatusCode(IntEnum):
 
 @dataclass
 class OperatorContext:
-    class_name: str = ''
+    class_name: str = ""
     class_kwargs: Dict = field(default_factory=dict)
     in_fps: List[Path] = field(default_factory=list)
     out_fps: List[Path] = field(default_factory=list)
@@ -36,7 +36,7 @@ class BaseOperator:
 
         return OperatorContext(
             class_name=self.__class__.__name__,
-            class_kwargs={k: v for k, v in locals_.items() if k not in ['self', '__class__']}
+            class_kwargs={k: v for k, v in locals_.items() if k not in ["self", "__class__"]},
         )
 
     def run(self, force_execute=False, **kwargs) -> StatusCode:
@@ -75,13 +75,13 @@ class BaseOperator:
 
 
 class BashOperator(BaseOperator):
-    def __init__(self, bash_command: str, cwd='.', **kwargs):
+    def __init__(self, bash_command: str, cwd=".", **kwargs):
         super().__init__(**kwargs)
         self.bash_command = bash_command
         self.cwd = cwd
 
     def __repr__(self):
-        return f'<$ {self.bash_command}>'
+        return f"<$ {self.bash_command}>"
 
     def __eq__(self, other):
         if isinstance(other, BashOperator):
@@ -92,9 +92,9 @@ class BashOperator(BaseOperator):
         return hash(self.bash_command)
 
     def execute(self, **kwargs):
-        log_fp = self.context.log_fp or '/dev/null'
-        with open(log_fp, 'w') as f:
-            subprocess.run(self.bash_command.split(), cwd=self.cwd, stdout=f, stderr=f, encoding='utf-8')
+        log_fp = self.context.log_fp or "/dev/null"
+        with open(log_fp, "w") as f:
+            subprocess.run(self.bash_command.split(), cwd=self.cwd, stdout=f, stderr=f, encoding="utf-8")
         return StatusCode.SUCCESS  # TODO: check run result
 
 
@@ -104,14 +104,16 @@ class PythonOperator(BaseOperator):
         self.python_callable = python_callable
 
     def __repr__(self):
-        arg_str = ','.join(['{}={}'.format(k, self.context.class_kwargs[k])
-                            for k in sorted(self.context.class_kwargs.keys())])
-        return f'<{self.context.class_name}({arg_str})>'
+        arg_str = ",".join(
+            ["{}={}".format(k, self.context.class_kwargs[k]) for k in sorted(self.context.class_kwargs.keys())]
+        )
+        return f"<{self.context.class_name}({arg_str})>"
 
     def __eq__(self, other):
         if isinstance(other, PythonOperator):
-            return (self.context.class_name == other.context.class_name) \
-                   and (self.context.class_kwargs == other.context.class_kwargs)
+            return (self.context.class_name == other.context.class_name) and (
+                self.context.class_kwargs == other.context.class_kwargs
+            )
         return False
 
     def __hash__(self):
@@ -121,6 +123,6 @@ class PythonOperator(BaseOperator):
         try:
             self.python_callable()
         except Exception:
-            LOGGER.exception(f'failed to execute python callable')
+            LOGGER.exception(f"failed to execute python callable")
             return StatusCode.FAILURE
         return StatusCode.SUCCESS

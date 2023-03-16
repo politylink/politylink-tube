@@ -32,14 +32,15 @@ class VoiceActivityDetector:
         db_agg_bin_ws = np.concatenate(([False], db_agg_bin, [False]))  # add sentinel for interval calculation
         interval_mat = np.flatnonzero(np.diff(db_agg_bin_ws.astype(int))).reshape((-1, 2))
 
-        out_df = pd.DataFrame(interval_mat, columns=['start_frame', 'end_frame'])
-        out_df['is_test_noise'] = out_df.apply(
-            lambda x: self.is_test_noise(db_agg[x['start_frame']:x['end_frame']]), axis=1)
-        out_df = out_df[~out_df['is_test_noise']]
+        out_df = pd.DataFrame(interval_mat, columns=["start_frame", "end_frame"])
+        out_df["is_test_noise"] = out_df.apply(
+            lambda x: self.is_test_noise(db_agg[x["start_frame"] : x["end_frame"]]), axis=1
+        )
+        out_df = out_df[~out_df["is_test_noise"]]
 
-        out_df['start_sec'] = out_df['start_frame'] * window_sec - buffer_sec
-        out_df['end_sec'] = out_df['end_frame'] * window_sec + buffer_sec
-        out_df = out_df[['start_sec', 'end_sec']]
+        out_df["start_sec"] = out_df["start_frame"] * window_sec - buffer_sec
+        out_df["end_sec"] = out_df["end_frame"] * window_sec + buffer_sec
+        out_df = out_df[["start_sec", "end_sec"]]
 
         return out_df
 
@@ -72,4 +73,4 @@ def fill_gap(a, k):
     v = np.ones(2 * k + 1)
     a = np.convolve(a, v) > 0  # dilation
     a = np.convolve(a, v) == v.size  # erosion
-    return a[2 * k:-2 * k]
+    return a[2 * k : -2 * k]

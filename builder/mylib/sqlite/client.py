@@ -42,7 +42,7 @@ class SqliteClient:
 
     def upsert(self, instance, keys) -> bool:
         if not keys:
-            raise ValueError('select at least one merge key')
+            raise ValueError("select at least one merge key")
 
         kwargs = dict([(key, getattr(instance, key)) for key in keys])
         db_instance = self.select_first(instance.__class__, **kwargs)
