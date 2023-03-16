@@ -19,7 +19,7 @@ class SqliteClient:
     def __del__(self):
         try:
             self.close()
-        except:  # HOTFIX: session may be already closed?
+        except Exception:  # HOTFIX: session may be already closed?
             pass
 
     def close(self):

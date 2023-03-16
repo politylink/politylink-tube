@@ -123,6 +123,6 @@ class PythonOperator(BaseOperator):
         try:
             self.python_callable()
         except Exception:
-            LOGGER.exception(f"failed to execute python callable")
+            LOGGER.exception("failed to execute python callable")
             return StatusCode.FAILURE
         return StatusCode.SUCCESS

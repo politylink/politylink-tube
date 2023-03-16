@@ -34,7 +34,7 @@ class VoiceActivityDetector:
 
         out_df = pd.DataFrame(interval_mat, columns=["start_frame", "end_frame"])
         out_df["is_test_noise"] = out_df.apply(
-            lambda x: self.is_test_noise(db_agg[x["start_frame"] : x["end_frame"]]), axis=1
+            lambda x: self.is_test_noise(db_agg[x["start_frame"]:x["end_frame"]]), axis=1
         )
         out_df = out_df[~out_df["is_test_noise"]]
 
@@ -73,4 +73,4 @@ def fill_gap(a, k):
     v = np.ones(2 * k + 1)
     a = np.convolve(a, v) > 0  # dilation
     a = np.convolve(a, v) == v.size  # erosion
-    return a[2 * k : -2 * k]
+    return a[2 * k:-2 * k]
