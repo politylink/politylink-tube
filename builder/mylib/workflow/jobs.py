@@ -145,7 +145,7 @@ class ApplyPatchJob(PythonOperator):
             mask = np.zeros(len(transcript_df)).astype(bool)
             for start_sec, end_sec in zip(patch_df["start_sec"], patch_df["end_sec"]):
                 mask_new = (transcript_df["start_ms"] >= start_sec * 1000) & (transcript_df["end_ms"] <= end_sec * 1000)
-                mask = mask | mask_new.values()
+                mask = mask | mask_new.values
             transcript_masked_df = transcript_df[~mask]
 
             out_df = pd.concat([transcript_masked_df, transcript_patch_df])
