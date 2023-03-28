@@ -38,9 +38,9 @@ def get_start_sid():
     videos_today = list(filter(lambda x: is_date_match(x, TODAY), videos))
 
     if videos_today:
-        return min(map(get_sid, videos_today))  # re-crawl all today's video
+        return min(map(get_sid, videos_today)) - 5  # re-crawl all today's video
     else:
-        return max(map(get_sid, videos)) + 1  # wait for new video
+        return max(map(get_sid, videos)) - 5
 
 
 def main():
