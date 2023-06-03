@@ -31,6 +31,36 @@ class InitDirJob(PythonOperator):
         super().__init__(main, context=context)
 
 
+class CleanDirJob(PythonOperator):
+    def __init__(self, out_dir: Path, run=False):
+        context = self.init_context(locals())
+
+        def main():
+            if success_fp.exists():
+                audio_fps = list(data_dir.glob("*.mp3")) + list(data_dir.glob("*.wav"))
+                LOGGER.info(f'remove {len(audio_fps)} audio files: {audio_fps}')
+                if run:
+                    for fp in audio_fps:
+                        fp.unlink()
+
+        success_fp = Path(out_dir) / "_SUCCESS"
+        data_dir = Path(out_dir) / "data"
+
+        super().__init__(main, context=context)
+
+
+class MarkDirSuccessJob(PythonOperator):
+    def __init__(self, out_dir: Path):
+        context = self.init_context(locals())
+
+        def main():
+            success_fp.touch()
+
+        success_fp = Path(out_dir) / "_SUCCESS"
+        context.out_fps = [success_fp]
+        super().__init__(main, context=context)
+
+
 class AudioDownloadJob(BashOperator):
     def __init__(self, m3u8_url: str, audio_fp: Path, log_fp: Path):
         context = self.init_context(locals())
