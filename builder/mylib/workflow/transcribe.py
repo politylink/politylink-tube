@@ -7,7 +7,8 @@ from typing import List
 import pandas as pd
 
 from mylib.utils.path import PathHelper
-from mylib.workflow.jobs import InitDirJob, AudioDownloadJob, VADJob, AudioSplitJob, WhisperJob, MergeWhisperJob
+from mylib.workflow.jobs import InitDirJob, AudioDownloadJob, VADJob, AudioSplitJob, WhisperJob, MergeWhisperJob, \
+    MarkDirSuccessJob
 from mylib.workflow.models import BaseOperator
 from mylib.workflow.patch import PatchJobScheduler, PatchRequest
 from mylib.workflow.scheduler import JobScheduler
@@ -39,6 +40,9 @@ class TranscribeJobScheduler(JobScheduler):
 
     def schedule(self, request: TranscribeRequest) -> List[BaseOperator]:
         work_dir = Path(self.path_helper.get_work_dir(video_id=request.video_id))
+        if (work_dir / '_SUCCESS').exists():
+            return []
+
         data_dir = work_dir / "data"
         log_dir = work_dir / "log"
         mp3_fp = data_dir / "audio.mp3"
@@ -78,4 +82,5 @@ class TranscribeJobScheduler(JobScheduler):
             return self.return_jobs(jobs)
 
         jobs += self.patch_job_scheduler.schedule(PatchRequest(video_id=request.video_id, datetime=request.datetime))
+        jobs.append(MarkDirSuccessJob(work_dir))
         return self.return_jobs(jobs)
